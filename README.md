@@ -8,7 +8,7 @@ Reusable charting library for d3.js
 
 
 Methods
----
+===
 
 `cd3.chart(options)`
 
@@ -20,7 +20,7 @@ Update an existing cd3 chart (cd3chart) with a new dataset
 
 
 Configuration
----
+====
 
 ```
 cd3.chart({
