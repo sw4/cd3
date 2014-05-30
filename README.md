@@ -37,42 +37,33 @@ cd3.chart({
     margin: 50, // optional (int/object) either a number or an object of top/left/bottom/right
     x: { // required (object)
         scale: { // optional
-            type: "time", // optional, defaults to linear
-            format: "%I:%M:%S", // optional - determines format of tick marks
-            domain: null, // optional, defaults to min/max of given source field in [data]
-            range: null // optional, defaults to [0, width] where width is parent container (chart.selector) height
+            type: "time", // optional (string), defaults to linear
+            format: "%I:%M:%S", // optional (string), determines format of tick marks
+            domain: null, // optional (array), defaults to min/max of given source field in [data]
+            range: null // optional  (array), defaults to [0, width] where width is parent container (chart.selector) height
         },
-        axis: { // optional
-            orient: null // optional
+        axis: { // optional (object)
+            orient: null // optional (string) can be any d3 axis orient string
         },
-        source: "time" // required
+        source: "time" // required (string) specifies key in data to be used for axis
     },
-    y: { // required
+    y: { // required (object)
         scale: { // optional
-            type: null, // optional, defaults to linear
-            domain: [0, 20], // optional, defaults to min/max of given source field in [data]
-            range: null // optional, defaults to [height, 0] where height is parent container (chart.selector) height
+            type: null, // optional (string), defaults to linear
+            domain: [0, 20], // optional (array), defaults to min/max of given source field in [data]
+            range: null // optional (array), defaults to [height, 0] where height is parent container (chart.selector) height
         },
         axis: { // optional
-            orient: null // optional
+            orient: null // optional (string) can be any d3 axis orient string
         },
-        source: "value1" // required only if domain not specified
+        },
+        source: "value1" // required (string) only if y->scale->domain not specified,  specifies key in data to be used for axis
     },
-    series: [{ //required
-        type: "line", //required
-        title: "First Series", //optional
-        source: "value1", //required,
-        class: "myFirstSeries" // optional CSS class to give line, defaults to series*index*, e.g. 'series0'
-    }, { //required
-        type: "line", //required
-        title: "Second Series", //optional
-        source: "value2", //required,
-        class: "mySecondSeries"
-    }, { //required
-        type: "line", //required
-        title: "Third Series", //optional
-        source: "value3", //required,
-        class: "myThirdSeries"
+    series: [{ //required (object)
+        type: "line", //required (string)
+        title: "First Series", //optional (string), defaults to series*index*, e.g. 'series0'
+        source: "value1", //required (string), key to use for series in data
+        cssClass: "myFirstSeries" // optional (string), CSS class to give line, defaults to series*index*, e.g. 'series0'
     }]
 });
 ```
