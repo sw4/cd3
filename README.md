@@ -68,6 +68,30 @@ cd3.chart({
 });
 ```
 
+The simplest configuration would be:
+
+```
+cd3.chart({
+    selector: "#chart",
+    data: data,
+    margin: 50, 
+    x: { 
+        source: "time"
+    },
+    y: { 
+        source: "value1"
+    },
+    series: [{ 
+        type: "line",
+        source: "value1", 
+    }, { 
+        type: "line",
+        title: "Second Series",
+        source: "value2",
+        class: "mySecondSeries"
+    }]
+});
+```
 
 Sample Dataset
 ----
