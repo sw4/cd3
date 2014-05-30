@@ -8,6 +8,17 @@ Reusable charting library for d3.js
 
 **[View Live Demo](http://jsfiddle.net/75UEt/1/)**
 
+
+Features
+---
+
+1. Simple reusable charting, leveraging d3
+2. Automatic time series support
+2. Automatic animated chart rescaling on container resize
+3. Automatic animated chart rescaling on data update
+4. cd3 object exposes d3 for more in depth manipulation
+
+
 Methods
 ===
 
