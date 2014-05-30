@@ -109,49 +109,49 @@ cd3.chart({
 CSS
 ----
 
-You should prefix all related classes with `.cd3` to ensure speficity. The `cd3` class is applied to the top level container the chart is applied to.
+Prefix all related classes with `.cd3` or your a chart container attribute (id, class etc) to ensure speficity. The `cd3` class is applied to the top level container the chart is applied to.
 
-`.cd3 .legend`
+`.legend`
 
 Style legend
 
-`.cd3 .legend span`
+`.legend span`
 
 Style legend items
 
-`.cd3 .legend .seriesClass`
+`.legend .seriesClass`
 
 Style legend item for a specific series, where seriesClass is the name of a class defined in a chart->series config
 
-`.cd .title`
+`.title`
 
 Style title
 
-`.cdc .axis`
+`.axis`
 
 Style axes
 
-`.cdc .x.axis`
+`.x.axis`
 
 Style X axis
 
-`.cdc .y.axis`
+`.y.axis`
 
 Style Y axis
 
-`.cdc .[x/y].axis .tick`
+`.[x/y].axis .tick`
 
 Style X/Y axis ticks
 
-`.cdc .path`
+`.path`
 
 Style paths
 
-`.cdc .line`
+`.line`
 
 Style lines
 
-`.cdc .seriesClass`
+`.cd3 .seriesClass`
 
 Style a series line, where seriesClass is the name of a class defined in a chart->series config
 
