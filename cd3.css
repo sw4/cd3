@@ -1,0 +1,28 @@
+.cd3 {
+    overflow:hidden;
+    position:relative; 
+}
+.cd3 .axis path, .cd3 .axis line {
+    fill: none;
+    stroke: #555555;
+    shape-rendering: crispEdges;
+}
+.cd3 .title {
+    fill:black;
+    font-size:14px;
+    font-family:serif;
+}
+.cd3 .line {
+    fill: none;
+    stroke: black;
+    stroke-width: 1px;
+}
+.cd3 .legend {
+    position: absolute;
+    right:10px;
+    top:10px;
+}
+.cd3 .legend span {
+    display:inline-block;
+    margin-left:10px;
+}
