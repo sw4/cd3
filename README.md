@@ -105,6 +105,56 @@ cd3.chart({
 });
 ```
 
+
+CSS
+----
+
+You should prefix all related classes with `.cd3` to ensure speficity. The `cd3` class is applied to the top level container the chart is applied to.
+
+`.cd3 .legend`
+
+Style legend
+
+`.cd3 .legend span`
+
+Style legend items
+
+`.cd3 .legend .seriesClass`
+
+Style legend item for a specific series, where seriesClass is the name of a class defined in a chart->series config
+
+`.cd .title`
+
+Style title
+
+`.cdc .axis`
+
+Style axes
+
+`.cdc .x.axis`
+
+Style X axis
+
+`.cdc .y.axis`
+
+Style Y axis
+
+`.cdc .[x/y].axis .tick`
+
+Style X/Y axis ticks
+
+`.cdc .path`
+
+Style paths
+
+`.cdc .line`
+
+Style lines
+
+`.cdc .seriesClass`
+
+Style a series line, where seriesClass is the name of a class defined in a chart->series config
+
 Sample Dataset
 ----
 
