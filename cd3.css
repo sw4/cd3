@@ -26,3 +26,28 @@
     display:inline-block;
     margin-left:10px;
 }
+.cd3 .line.path {
+    fill:none;
+}
+.cd3 .tipOverlay {
+    fill: none;
+    pointer-events: all;
+    z-index:9999;
+}
+.cd3 .tip {
+    fill:white;
+    pointer-events:none;
+    stroke:black;
+    stroke-width:0px;
+}
+.cd3 .tipInfo {
+    position: absolute;
+    padding: 5px;
+    top:0;
+    left:0;
+    background: rgba(0, 0, 0, 0.5);
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+    color:lightgrey;
+}

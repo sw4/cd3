@@ -16,7 +16,7 @@ var cd3 = {
         cd3_object.cd3.d3xAxis.ticks(Math.max(cd3_object.cd3.width / 130, 2));
     },
     refactorData: function (cd3_object, data) {
-        data=data||cd3_object.cd3.data;
+        data = data || cd3_object.cd3.data;
         if (cd3_object.cd3.x.scale.type == 'time') {
             data = data.slice();
             data.sort(function (a, b) {
@@ -30,6 +30,12 @@ var cd3 = {
         return cd3_object.cd3.data.filter(function (d, i) {
             return i % Math.ceil(dataPerPixel) == 0;
         });
+    },
+    bisectData: function (cd3_object, xPoint) {
+        var bisect = d3.bisector(function (data) {
+            return data[cd3_object.cd3.x.source];
+        }).right;
+        return bisect(cd3_object.cd3.data, xPoint);
     },
     updateScale: function (cd3_object) {
         cd3_object.cd3.d3parentSvg.attr("width", cd3_object.cd3.width + cd3_object.cd3.margin.left + cd3_object.cd3.margin.right)
@@ -63,6 +69,71 @@ var cd3 = {
         }
         cd3_object.cd3.width = cd3_object.cd3.width - cd3_object.cd3.margin.left - cd3_object.cd3.margin.right;
         cd3_object.cd3.height = cd3_object.cd3.height - cd3_object.cd3.margin.top - cd3_object.cd3.margin.bottom;
+
+        cd3_object.cd3.tips && cd3_object.cd3.d3TipOverlay && cd3_object.cd3.d3TipOverlay.attr("width", cd3_object.cd3.width).attr("height", cd3_object.cd3.height);
+    },
+    tips: function (cd3_object) {
+        var scope = this,
+            tips = [];
+        
+         // create tooltip markers
+
+        cd3_object.cd3.series.forEach(function (serie) {
+            serie.d3Tip = cd3_object.cd3.d3graphSvg.append('circle').attr("display", "none").attr('r', 4.5).attr("class", "tip " + serie.cssClass);
+            tips.push(serie.d3Tip);
+        });
+
+        // create tooltip overlay
+        
+        cd3_object.cd3.d3TipOverlay = cd3_object.cd3.d3graphSvg.append("rect").attr("class", "tipOverlay").attr("width", cd3_object.cd3.width).attr("height", cd3_object.cd3.height)
+        .on("mouseover", function () {
+            cd3_object.cd3.d3TipInfo = d3.select("body").append("div").attr("class", "cd3 tipInfo").html("jkhukjh");
+
+            cd3_object.cd3.data && cd3_object.cd3.data.length > 1 && tips.forEach(function (tip) {
+                tip.style("display", "block");
+            });
+            cd3_object.cd3.d3TipInfo.style("display", "block");
+        }).on("mouseout", function () {
+            cd3_object.cd3.data && cd3_object.cd3.data.length > 1 && tips.forEach(function (tip) {
+                tip.style("display", "none");
+            });
+            cd3_object.cd3.d3TipInfo.style("display", "none");
+        }).on("mousemove", function () {
+
+            var mouse = d3.mouse(this);
+            if (!cd3_object.cd3.data || cd3_object.cd3.data.length < 1) {
+                return false;
+            }
+            
+            var xPoint = cd3_object.cd3.d3xScale.invert(mouse[0]),
+                xPointIndex = scope.bisectData(cd3_object, xPoint),
+                startDatum = data[xPointIndex - 1],
+                endDatum = data[xPointIndex];
+
+            if (!startDatum || !endDatum) {return false;}
+
+            var xRange = endDatum[cd3_object.cd3.x.source] - startDatum[cd3_object.cd3.x.source],
+                tipInfo = (cd3_object.cd3.x.title ? cd3_object.cd3.x.title : cd3_object.cd3.x.source) + ":" + (cd3_object.cd3.x.scale.format ? cd3_object.cd3.x.scale.format(cd3_object.cd3.d3xScale.invert(mouse[0])) : cd3_object.cd3.d3xScale.invert(mouse[0]));
+
+            cd3_object.cd3.series.forEach(function (serie) {
+                var interpolateValue = d3.interpolateNumber(startDatum[serie.source], endDatum[serie.source]),
+                    interpolatedValue = interpolateValue((xPoint - startDatum[cd3_object.cd3.x.source]) / xRange);
+                serie.d3Tip.attr('cx', mouse[0])
+                    .attr('cy', cd3_object.cd3.d3yScale(interpolatedValue));
+
+                tipInfo += " <span class='" + serie.cssClass + " " + serie.source + "'>" + (serie.title ? serie.title : serie.source) + ":" + interpolatedValue.toFixed(2) + "</span>";
+
+            });
+
+            var drawWidth = parseInt(cd3_object.style("width"));
+            cd3_object.cd3.d3TipInfo.style("top", mouse[1] + cd3_object.cd3.margin.top + 10 + "px");
+            if (mouse[0] > (drawWidth / 2)) {
+                cd3_object.cd3.d3TipInfo.style("right", drawWidth - mouse[0] - cd3_object.cd3.margin.right + 10 + "px").style("left", "auto");
+            } else {
+                cd3_object.cd3.d3TipInfo.style("left", mouse[0] + cd3_object.cd3.margin.right + 20 + "px").style("right", "auto");
+            }
+            cd3_object.cd3.d3TipInfo.html(tipInfo);
+        });
     },
     chart: function (config) {
         //define scope
@@ -81,7 +152,7 @@ var cd3 = {
         if (!cd3_object.cd3.animate || !cd3_object.cd3.animate.ease) {
             cd3_object.cd3.animate.ease = "linear";
         }
-        if (!cd3_object.cd3.animate || cd3_object.cd3.animate.duration===null) {
+        if (!cd3_object.cd3.animate || cd3_object.cd3.animate.duration === null) {
             cd3_object.cd3.animate.duration = 200;
         }
         // set resampling
@@ -155,6 +226,12 @@ var cd3 = {
         cd3_object.cd3.d3graphTitle = cd3_object.cd3.title ? cd3_object.cd3.d3parentSvg.append("text").text(cd3_object.cd3.title) : null;
         cd3_object.cd3.d3graphLegend = cd3_object.append("div").attr("class", "legend");
 
+        if (cd3_object.cd3.tips) {
+            scope.tips(cd3_object);
+        }
+
+
+
         scope.updateScale(cd3_object);
 
         cd3_object.cd3.series.forEach(function (serie, index) {
@@ -171,12 +248,12 @@ var cd3 = {
                     serie.path = cd3_object.cd3.d3graphSvg.append("g")
                         .append("path")
                         .data(cd3_object.cd3.resampling ? [scope.resampleData(cd3_object)] : [cd3_object.cd3.data])
-                        .attr("class", "line path " + (serie.cssClass || "series" + index))
+                        .attr("class", "line path " + (serie.cssClass || serie.source))
                         .attr("d", serie.line);
                     break;
 
             }
-            cd3_object.cd3.d3graphLegend.html(cd3_object.cd3.d3graphLegend.html() + "<span class=" + (serie.cssClass || "series" + index) + ">" + (serie.title || "series" + index) + "</span>");
+            cd3_object.cd3.d3graphLegend.html(cd3_object.cd3.d3graphLegend.html() + "<span class=" + (serie.cssClass || serie.source) + ">" + (serie.title || "series" + index) + "</span>");
         });
 
 
@@ -184,23 +261,23 @@ var cd3 = {
         return cd3_object;
     },
     update: function (cd3_object, data) {
-        
+
         var scope = this;
         if (!data) {
             return false;
         }
-        
+
         //leave current dataset in situ
         var oldData = cd3_object.cd3.data;
         // copy array
         var newData = data.slice();
-        
+
 
         // sort data if timeseries...
-        newData=scope.refactorData(cd3_object, newData);
+        newData = scope.refactorData(cd3_object, newData);
 
-        
-        
+
+
         //  through and replace items
         var diff = newData.length - oldData.length
         var checkLength = diff < 0 ? oldData.length += diff : oldData.length;
@@ -222,9 +299,9 @@ var cd3 = {
     },
     updateData: function (cd3_object) {
         var scope = this;
-        
+
         // update the domains (value ranges) for the axis
-                
+
         scope.updateDomain(cd3_object, "x");
         scope.updateDomain(cd3_object, "y");
 
@@ -259,7 +336,7 @@ var cd3 = {
             scope.updateRange(cd3_object, "y");
             scope.updateScale(cd3_object);
             scope.updateTicks(cd3_object);
-            scope.update(cd3_object, cd3_object.cd3.data);            
+            scope.update(cd3_object, cd3_object.cd3.data);
         });
     }
 }
