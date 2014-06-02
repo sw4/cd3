@@ -40,7 +40,7 @@
     stroke:black;
     stroke-width:0px;
 }
-.cd3 .tipInfo {
+.cd3.tipInfo {
     position: absolute;
     padding: 5px;
     top:0;

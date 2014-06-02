@@ -87,7 +87,7 @@ var cd3 = {
         
         cd3_object.cd3.d3TipOverlay = cd3_object.cd3.d3graphSvg.append("rect").attr("class", "tipOverlay").attr("width", cd3_object.cd3.width).attr("height", cd3_object.cd3.height)
         .on("mouseover", function () {
-            cd3_object.cd3.d3TipInfo = d3.select("body").append("div").attr("class", "cd3 tipInfo").html("jkhukjh");
+            cd3_object.cd3.d3TipInfo = d3.select("body").append("div").attr("class", "cd3 tipInfo").html();
 
             cd3_object.cd3.data && cd3_object.cd3.data.length > 1 && tips.forEach(function (tip) {
                 tip.style("display", "block");
