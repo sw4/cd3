@@ -38,6 +38,7 @@ cd3.chart({
     selector: "#chart", // required (string), can be any kind of valid 'd3.select' selector
     title: "My Chart", // optional (string), title text to be added to the chart (appears top center)
     resizable: true, // optional (bool), false by default, causes chart to fluidly resize on container resize
+    tips:false, // optional (bool) display tooltips on hover
     resample: false, // optional (bool), defaults to true, prevents number of datapoints exceeding visible pixel number, for better performance
     legend: true, // optional (bool), show a legend (defaults to top right, cn be changed in CSS)
     animate: { // optional (object), configures proeprties for all chart animations (resize, new data)
@@ -74,7 +75,8 @@ cd3.chart({
         type: "line", //required (string)
         title: "First Series", //optional (string), defaults to series*index*, e.g. 'series0'
         source: "value1", //required (string), key to use for series in data
-        cssClass: "myFirstSeries" // optional (string), CSS class to give line, defaults to series*index*, e.g. 'series0'
+        cssClass: "myFirstSeries" // optional (string), CSS class to give line, defaults to series source,
+        title: "series title" // (string) text to refer to the series by in legend/tooltips
     }]
 });
 ```
