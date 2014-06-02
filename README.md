@@ -154,7 +154,7 @@ Style lines
 
 `.cd3 .seriesClass`
 
-Style a series line, where seriesClass is the name of a class defined in a chart->series config
+Style a series, where seriesClass is the name of a class defined in a chart->series config (affects all related lines, tooltip markers, and legend)
 
 Sample Dataset
 ----
