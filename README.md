@@ -6,7 +6,7 @@ Reusable charting library for d3.js
 
 **Note**: Currently only configured to support line & scatter charts
 
-**[View Live Demo](http://jsfiddle.net/75UEt/8/)**
+**[View Live Demo](http://jsfiddle.net/75UEt/15/)**
 
 Features
 ---
