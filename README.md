@@ -3,8 +3,12 @@ cd3
 
 Reusable charting library for d3.js
 
+Supported Chart Types
+---
+1. Line
+2. Column
+3. Scatter
 
-**Note**: Currently only configured to support line & scatter charts
 
 **[View Live Demo](http://jsfiddle.net/75UEt/15/)**
 
@@ -69,7 +73,7 @@ cd3.chart({
         source: "value1" // required (string) only if y->scale->domain not specified,  specifies key in data to be used for axis
     },
     series: [{ //required (object)
-        type: "line", //required (string) can be either "line" or "scatter"
+        type: "line", //required (string) can be either "line", "column" or "scatter"
         title: "First Series", //optional (string), defaults to series*index*, e.g. 'series0'
         source: "value1", //required (string), key to use for series in data
         cssClass: "myFirstSeries" // optional (string), CSS class to give line, defaults to series source,
