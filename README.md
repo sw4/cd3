@@ -60,7 +60,7 @@ cd3.chart({
             orient: null // optional (string) can be any d3 axis orient string.
             ticks:{ // optional (object)
                 rotate: 0, // optional (integer) degrees to rotate tick text by
-                top: .71em // optional (integer) pixel offset from top of tick text to tick line
+                top: .71em // optional (integer/string) offset from top of tick text to tick line
             }
         },
         source: "time" // required (string) specifies key in data to be used for axis
@@ -75,7 +75,7 @@ cd3.chart({
             orient: null, // optional (string) can be any d3 axis orient string
             ticks:{ // optional (object)
                 rotate: 0, // optional (integer) degrees to rotate tick text by
-                top: .71em // optional (integer) pixel offset from top of tick text to tick line
+                top: .71em // optional (integer/string) offset from top of tick text to tick line
             }
         },
         source: "value1" // required (string) only if y->scale->domain not specified,  specifies key in data to be used for axis
