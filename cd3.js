@@ -75,19 +75,19 @@ var cd3 = {
     tips: function (cd3_object) {
         var scope = this,
             tips = [];
-        
-         // create tooltip markers
 
+        // create tooltip markers
+        var tipsGroup=cd3_object.cd3.d3graphSvg.append("g").attr("class", "tips");
         cd3_object.cd3.series.forEach(function (serie) {
-            serie.d3Tip = cd3_object.cd3.d3graphSvg.append('circle').attr("display", "none").attr('r', 4.5).attr("class", "tip " + serie.cssClass);
+            serie.d3Tip = tipsGroup.append('circle').attr("display", "none").attr('r', 4.5).attr("class", "tip " + serie.cssClass);
             tips.push(serie.d3Tip);
         });
 
         // create tooltip overlay
-        
-        cd3_object.cd3.d3TipOverlay = cd3_object.cd3.d3graphSvg.append("rect").attr("class", "tipOverlay").attr("width", cd3_object.cd3.width).attr("height", cd3_object.cd3.height)
-        .on("mouseover", function () {
-            cd3_object.cd3.d3TipInfo = d3.select("body").append("div").attr("class", "cd3 tipInfo").html();
+
+        cd3_object.cd3.d3TipOverlay = cd3_object.cd3.d3graphSvg.append("rect").attr("class", "overlay").attr("width", cd3_object.cd3.width).attr("height", cd3_object.cd3.height)
+            .on("mouseover", function () {
+            cd3_object.cd3.d3TipInfo = d3.select("body").append("div").attr("class", "cd3 tips");
 
             cd3_object.cd3.data && cd3_object.cd3.data.length > 1 && tips.forEach(function (tip) {
                 tip.style("display", "block");
@@ -104,13 +104,15 @@ var cd3 = {
             if (!cd3_object.cd3.data || cd3_object.cd3.data.length < 1) {
                 return false;
             }
-            
+
             var xPoint = cd3_object.cd3.d3xScale.invert(mouse[0]),
                 xPointIndex = scope.bisectData(cd3_object, xPoint),
                 startDatum = data[xPointIndex - 1],
                 endDatum = data[xPointIndex];
 
-            if (!startDatum || !endDatum) {return false;}
+            if (!startDatum || !endDatum) {
+                return false;
+            }
 
             var xRange = endDatum[cd3_object.cd3.x.source] - startDatum[cd3_object.cd3.x.source],
                 tipInfo = (cd3_object.cd3.x.title ? cd3_object.cd3.x.title : cd3_object.cd3.x.source) + ":" + (cd3_object.cd3.x.scale.format ? cd3_object.cd3.x.scale.format(cd3_object.cd3.d3xScale.invert(mouse[0])) : cd3_object.cd3.d3xScale.invert(mouse[0]));
@@ -220,11 +222,16 @@ var cd3 = {
 
 
         cd3_object.cd3.d3parentSvg = cd3_object.attr("class", "cd3").append("svg");
-        cd3_object.cd3.d3graphSvg = cd3_object.cd3.d3parentSvg.append("g").attr("position", "relative");
-        cd3_object.cd3.d3graphXAxis = cd3_object.cd3.d3graphSvg.append("g");
-        cd3_object.cd3.d3graphYAxis = cd3_object.cd3.d3graphSvg.append("g");
+        cd3_object.cd3.d3graphSvg = cd3_object.cd3.d3parentSvg.append("g").attr("class", "chart").attr("position", "relative");
+        var axes = cd3_object.cd3.d3graphSvg.append("g").attr("class", "axes");
+        cd3_object.cd3.d3graphXAxis = axes.append("g");
+        cd3_object.cd3.d3graphYAxis = axes.append("g");
         cd3_object.cd3.d3graphTitle = cd3_object.cd3.title ? cd3_object.cd3.d3parentSvg.append("text").text(cd3_object.cd3.title) : null;
         cd3_object.cd3.d3graphLegend = cd3_object.append("div").attr("class", "legend");
+
+
+        cd3_object.cd3.d3graphSvg.append("g").attr("class", "series");
+
 
         if (cd3_object.cd3.tips) {
             scope.tips(cd3_object);
@@ -235,21 +242,44 @@ var cd3 = {
         scope.updateScale(cd3_object);
 
         cd3_object.cd3.series.forEach(function (serie, index) {
+
+
+            var series = cd3_object.selectAll(".series").append("g")
+                .attr("class", serie.type + " " + serie.source + " " + serie.cssClass);
+
             switch (serie.type) {
                 default:
                 case "line":
-                    serie.line = d3.svg.line()
+                    var line = d3.svg.line()
                         .x(function (d, i) {
                         return cd3_object.cd3.d3xScale(d[cd3_object.cd3.x.source]);
                     })
                         .y(function (d, i) {
                         return cd3_object.cd3.d3yScale(d[serie.source]);
                     });
-                    serie.path = cd3_object.cd3.d3graphSvg.append("g")
-                        .append("path")
-                        .data(cd3_object.cd3.resampling ? [scope.resampleData(cd3_object)] : [cd3_object.cd3.data])
-                        .attr("class", "line path " + (serie.cssClass || serie.source))
-                        .attr("d", serie.line);
+                    // Create path
+                    var path = series.selectAll("path")
+                        .data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : [cd3_object.cd3.data]);
+                    path.enter().append("path")
+                        .attr("d", line);
+
+                    break;
+                case "scatter":
+
+                    var circle = series.selectAll("circle");
+
+                    // Create circles
+                    circle = series.selectAll("circle")
+                        .data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data);
+                    circle.enter().append("circle")
+                        .attr("r", 2.5)
+                        .attr("cx", function (d) {
+                        return cd3_object.cd3.d3xScale(d[cd3_object.cd3.x.source]);
+                    })
+                        .attr("cy", function (d) {
+                        return cd3_object.cd3.d3yScale(d[serie.source]);
+                    });
+
                     break;
 
             }
@@ -308,11 +338,68 @@ var cd3 = {
 
         // loop through each series and redraw
         cd3_object.cd3.series.forEach(function (serie) {
-            serie.path.attr("transform", null)
-                .transition()
-                .duration(cd3_object.cd3.animate.duration)
-                .ease(cd3_object.cd3.animate.ease)
-                .attr("d", serie.line);
+
+            var series = cd3_object.select("g." + serie.type + "." + serie.source);
+
+            switch (serie.type) {
+                default:
+                case "line":
+
+                    var line = d3.svg.line()
+                        .x(function (d, i) {
+                        return cd3_object.cd3.d3xScale(d[cd3_object.cd3.x.source]);
+                    })
+                        .y(function (d, i) {
+                        return cd3_object.cd3.d3yScale(d[serie.source]);
+                    });
+
+                    var path = series.selectAll("path");
+
+                    //Update path positions
+
+                    path.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : [cd3_object.cd3.data])
+                        .transition()
+                        .duration(cd3_object.cd3.animate.duration)
+                        .ease(cd3_object.cd3.animate.ease)
+                        .attr("d", line);
+
+                    break;
+                case "scatter":
+
+                    var circle = series.selectAll("circle");
+
+                    //Update circle positions
+                    circle.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
+                        .transition()
+                        .duration(cd3_object.cd3.animate.duration)
+                        .ease(cd3_object.cd3.animate.ease)
+                        .attr("cx", function (d) {
+                        return cd3_object.cd3.d3xScale(d[cd3_object.cd3.x.source]);
+                    })
+                        .attr("cy", function (d) {
+                        return cd3_object.cd3.d3yScale(d[serie.source]);
+                    });
+
+                    //Add new circles
+                    circle.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
+                        .enter()
+                        .append("circle")
+                        .attr("cx", function (d) {
+                        return cd3_object.cd3.d3xScale(d[cd3_object.cd3.x.source]);
+                    })
+                        .attr("cy", function (d) {
+                        return cd3_object.cd3.d3yScale(d[serie.source]);
+                    })
+                        .attr("r", 2);
+
+                    // Remove old circles
+                    circle.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
+                        .exit().remove();
+
+                    break;
+
+            }
+
         });
         // redraw the axes..
         cd3_object.cd3.d3graphYAxis.transition()
