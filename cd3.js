@@ -77,7 +77,7 @@ var cd3 = {
             tips = [];
 
         // create tooltip markers
-        var tipsGroup=cd3_object.cd3.d3graphSvg.append("g").attr("class", "tips");
+        var tipsGroup = cd3_object.cd3.d3graphSvg.append("g").attr("class", "tips");
         cd3_object.cd3.series.forEach(function (serie) {
             serie.d3Tip = tipsGroup.append('circle').attr("display", "none").attr('r', 4.5).attr("class", "tip " + serie.cssClass);
             tips.push(serie.d3Tip);
@@ -281,6 +281,25 @@ var cd3 = {
                     });
 
                     break;
+                case "column":
+                    var data = cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data;
+                    var colWidth = cd3_object.cd3.width / data.length;
+                    // Create columns (rectanlges)
+                    var column = series.selectAll("rect")
+                        .data(data);
+                    column.enter().append("rect")
+                        .attr("y", function (d) {
+                        return cd3_object.cd3.d3yScale(d[serie.source]);
+                    })
+                        .attr("x", function (d, i) {
+                        return (i * colWidth) + 1;
+                    })
+                        .attr("height", function (d) {
+                        return cd3_object.cd3.height - cd3_object.cd3.d3yScale(d[serie.source]);
+                    })
+                        .attr("width", colWidth - 2);
+
+                    break;
 
             }
             cd3_object.cd3.d3graphLegend.html(cd3_object.cd3.d3graphLegend.html() + "<span class=" + (serie.cssClass || serie.source) + ">" + (serie.title || "series" + index) + "</span>");
@@ -352,16 +371,57 @@ var cd3 = {
                         .y(function (d, i) {
                         return cd3_object.cd3.d3yScale(d[serie.source]);
                     });
-
-                    var path = series.selectAll("path");
-
                     //Update path positions
-
-                    path.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : [cd3_object.cd3.data])
+                    var path = series.selectAll("path")
+                        .data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : [cd3_object.cd3.data])
                         .transition()
                         .duration(cd3_object.cd3.animate.duration)
                         .ease(cd3_object.cd3.animate.ease)
                         .attr("d", line);
+
+                    break;
+                case "column":
+
+
+                    var data = cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data;
+                    var colWidth = cd3_object.cd3.width / data.length;
+                    var column = series.selectAll("rect");
+
+                    //Update columns positions
+                    column.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
+                        .transition()
+                        .duration(cd3_object.cd3.animate.duration)
+                        .ease(cd3_object.cd3.animate.ease)
+                        .attr("y", function (d) {
+                        return cd3_object.cd3.d3yScale(d[serie.source]);
+                    })
+                        .attr("x", function (d, i) {
+                        return (i * colWidth) + 1;
+                    })
+                        .attr("height", function (d) {
+                        return cd3_object.cd3.height - cd3_object.cd3.d3yScale(d[serie.source]);
+                    })
+                        .attr("width", colWidth - 2);
+
+
+                    //Add new columns
+                    column.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
+                        .enter()
+                        .append("rect")
+                        .attr("y", function (d) {
+                        return cd3_object.cd3.d3yScale(d[serie.source]);
+                    })
+                        .attr("x", function (d, i) {
+                        return (i * colWidth) + 1;
+                    })
+                        .attr("height", function (d) {
+                        return cd3_object.cd3.height - cd3_object.cd3.d3yScale(d[serie.source]);
+                    })
+                        .attr("width", colWidth - 2);
+
+                    // Remove old columns
+                    column.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
+                        .exit().remove();
 
                     break;
                 case "scatter":
