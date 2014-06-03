@@ -390,7 +390,7 @@ var cd3 = {
                         .attr("cy", function (d) {
                         return cd3_object.cd3.d3yScale(d[serie.source]);
                     })
-                        .attr("r", 2);
+                        .attr("r", 2.5);
 
                     // Remove old circles
                     circle.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
