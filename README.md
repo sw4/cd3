@@ -5,13 +5,11 @@ Reusable charting library for d3.js
 
 Supported Chart Types
 ---
-1. Line
-2. Column
-3. Scatter
-
-And any mix of the above
-
-**[View Live Demo](http://jsfiddle.net/75UEt/15/)**
+1. [Line](http://jsfiddle.net/75UEt/19/)
+2. [Column](http://jsfiddle.net/75UEt/21/)
+3. [Scatter (linear)](http://jsfiddle.net/75UEt/19/)
+4. [Scatter (ordinal)](http://jsfiddle.net/75UEt/20/)
+5. [Mixed](http://jsfiddle.net/75UEt/18/)
 
 Features
 ---
