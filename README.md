@@ -40,7 +40,7 @@ cd3.chart({
     selector: "#chart", // required (string), can be any kind of valid 'd3.select' selector
     title: "My Chart", // optional (string), title text to be added to the chart (appears top center)
     resizable: true, // optional (bool), false by default, causes chart to fluidly resize on container resize
-    tips:false, // optional (bool) display tooltips on hover
+    tips:false, // optional (bool) display tooltips on hover !!! CURRENTLY BUGGED FOR NON LINE CHARTS 
     resample: false, // optional (bool), defaults to true, prevents number of datapoints exceeding visible pixel number, for better performance
     legend: true, // optional (bool), show a legend (defaults to top right, cn be changed in CSS)
     animate: { // optional (object), configures proeprties for all chart animations (resize, new data)
