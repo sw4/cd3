@@ -1,15 +1,44 @@
 var cd3 = {
     list: [],
     updateDomain: function (cd3_object, axis, domain) {
+
         var scope = this,
             scale = axis === "x" ? cd3_object.cd3.d3xScale : cd3_object.cd3.d3yScale;
-        scale.domain(domain || cd3_object.cd3[axis].scale && cd3_object.cd3[axis].scale.domain || d3.extent(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data, function (d) {
-            return d[cd3_object.cd3[axis].source];
-        }));
+        
+        //domain can be directly passed, read from the config, or interpreted automatically
+        if(!domain && cd3_object.cd3[axis].scale && cd3_object.cd3[axis].scale.domain){
+            // no domain passed, one defined in initial chart config...so use that
+            domain=cd3_object.cd3[axis].scale.domain;
+        }else if(!domain && cd3_object.cd3[axis].scale && cd3_object.cd3[axis].scale.type == "ordinal"){
+            // no domain passed or defined in initial chart config...if scale is ordinal..define categories
+            domain=data.map(function(d) {return d[cd3_object.cd3[axis].source]; })
+        }else if(!domain){
+            // no domain passed, defined in initial chart config and scale is not ordinal..so use min/max values
+            domain=d3.extent(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data, function (d) {
+                return d[cd3_object.cd3[axis].source];
+            });    
+        }        
+        scale.domain(domain);
     },
     updateRange: function (cd3_object, axis, range) {
-        var scale = axis === "x" ? cd3_object.cd3.d3xScale : cd3_object.cd3.d3yScale;
-        scale.range(range || cd3_object.cd3[axis].scale && cd3_object.cd3[axis].scale.range || (axis === "x" ? [0, cd3_object.cd3.width] : [cd3_object.cd3.height, 0]));
+        var scale = axis === "x" ? cd3_object.cd3.d3xScale : cd3_object.cd3.d3yScale;        
+          
+        
+        //range can be directly passed, read from the config, or interpreted automatically
+        if(!range && cd3_object.cd3[axis].scale && cd3_object.cd3[axis].scale.range){
+            // no range passed, one defined in initial chart config...so use that
+            scale.range(cd3_object.cd3[axis].scale.range);
+        }else if(!range && cd3_object.cd3[axis].scale && cd3_object.cd3[axis].scale.type == "ordinal"){
+            // no range passed or defined in initial chart config...if scale is ordinal..range bands (column) or points (scatter)
+            if(cd3_object.cd3.series.length>0 && cd3_object.cd3.series[0].type=="column"){
+                scale.rangeBands([0, cd3_object.cd3.width]);    
+            }else{
+                scale.rangePoints([0, cd3_object.cd3.width]);
+            }
+        }else if(!range){
+            // no range passed, defined in initial chart config and scale is not ordinal..so use min/max values
+            scale.range(axis === "x" ? [0, cd3_object.cd3.width] : [cd3_object.cd3.height, 0]);                
+        }  
     },
     updateTicks: function (cd3_object) {
         cd3_object.cd3.d3yAxis.ticks(Math.max(cd3_object.cd3.height / 20, 2));
@@ -182,6 +211,9 @@ var cd3 = {
             case "linear":
                 cd3_object.cd3.d3xScale = d3.scale.linear();
                 break;
+            case "ordinal":
+                cd3_object.cd3.d3xScale = d3.scale.ordinal();
+                break;                
         }
 
         scope.updateDomain(cd3_object, "x");
