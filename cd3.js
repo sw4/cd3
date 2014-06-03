@@ -4,45 +4,61 @@ var cd3 = {
 
         var scope = this,
             scale = axis === "x" ? cd3_object.cd3.d3xScale : cd3_object.cd3.d3yScale;
-        
+
         //domain can be directly passed, read from the config, or interpreted automatically
-        if(!domain && cd3_object.cd3[axis].scale && cd3_object.cd3[axis].scale.domain){
+        if (!domain && cd3_object.cd3[axis].scale && cd3_object.cd3[axis].scale.domain) {
             // no domain passed, one defined in initial chart config...so use that
-            domain=cd3_object.cd3[axis].scale.domain;
-        }else if(!domain && cd3_object.cd3[axis].scale && cd3_object.cd3[axis].scale.type == "ordinal"){
+            domain = cd3_object.cd3[axis].scale.domain;
+        } else if (!domain && cd3_object.cd3[axis].scale && cd3_object.cd3[axis].scale.type == "ordinal") {
             // no domain passed or defined in initial chart config...if scale is ordinal..define categories
-            domain=data.map(function(d) {return d[cd3_object.cd3[axis].source]; })
-        }else if(!domain){
-            // no domain passed, defined in initial chart config and scale is not ordinal..so use min/max values
-            domain=d3.extent(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data, function (d) {
+            domain = data.map(function (d) {
                 return d[cd3_object.cd3[axis].source];
-            });    
-        }        
+            })
+        } else if (!domain) {
+            // no domain passed, defined in initial chart config and scale is not ordinal..so use min/max values
+            domain = d3.extent(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data, function (d) {
+                return d[cd3_object.cd3[axis].source];
+            });
+        }
         scale.domain(domain);
     },
     updateRange: function (cd3_object, axis, range) {
-        var scale = axis === "x" ? cd3_object.cd3.d3xScale : cd3_object.cd3.d3yScale;        
-          
-        
+        var scale = axis === "x" ? cd3_object.cd3.d3xScale : cd3_object.cd3.d3yScale;
+
+
         //range can be directly passed, read from the config, or interpreted automatically
-        if(!range && cd3_object.cd3[axis].scale && cd3_object.cd3[axis].scale.range){
+        if (!range && cd3_object.cd3[axis].scale && cd3_object.cd3[axis].scale.range) {
             // no range passed, one defined in initial chart config...so use that
             scale.range(cd3_object.cd3[axis].scale.range);
-        }else if(!range && cd3_object.cd3[axis].scale && cd3_object.cd3[axis].scale.type == "ordinal"){
+        } else if (!range && cd3_object.cd3[axis].scale && cd3_object.cd3[axis].scale.type == "ordinal") {
             // no range passed or defined in initial chart config...if scale is ordinal..range bands (column) or points (scatter)
-            if(cd3_object.cd3.series.length>0 && cd3_object.cd3.series[0].type=="column"){
-                scale.rangeBands([0, cd3_object.cd3.width]);    
-            }else{
+            if (cd3_object.cd3.series.length > 0 && cd3_object.cd3.series[0].type == "column") {
+                scale.rangeBands([0, cd3_object.cd3.width]);
+            } else {
                 scale.rangePoints([0, cd3_object.cd3.width]);
             }
-        }else if(!range){
+        } else if (!range) {
             // no range passed, defined in initial chart config and scale is not ordinal..so use min/max values
-            scale.range(axis === "x" ? [0, cd3_object.cd3.width] : [cd3_object.cd3.height, 0]);                
-        }  
+            scale.range(axis === "x" ? [0, cd3_object.cd3.width] : [cd3_object.cd3.height, 0]);
+        }
     },
     updateTicks: function (cd3_object) {
+        
+        function orientTicks(axis){
+            var rotate=cd3_object.cd3[axis].axis && cd3_object.cd3[axis].axis.ticks && cd3_object.cd3[axis].axis.ticks.rotate || 0,
+            top=cd3_object.cd3[axis].axis && cd3_object.cd3[axis].axis.ticks && cd3_object.cd3[axis].axis.ticks.top || null,
+            ticks= axis == "x"?cd3_object.cd3.d3graphXAxis.selectAll(".tick text") :cd3_object.cd3.d3graphYAxis.selectAll(".tick text");
+            ticks
+                .attr("transform", function(d) {
+                    return "rotate("+rotate+")" 
+                });
+            top && ticks.attr("dy", top);            
+        }
+        
         cd3_object.cd3.d3yAxis.ticks(Math.max(cd3_object.cd3.height / 20, 2));
+        orientTicks("x");
         cd3_object.cd3.d3xAxis.ticks(Math.max(cd3_object.cd3.width / 130, 2));
+        orientTicks("y");
     },
     refactorData: function (cd3_object, data) {
         data = data || cd3_object.cd3.data;
@@ -213,7 +229,7 @@ var cd3 = {
                 break;
             case "ordinal":
                 cd3_object.cd3.d3xScale = d3.scale.ordinal();
-                break;                
+                break;
         }
 
         scope.updateDomain(cd3_object, "x");
@@ -250,7 +266,7 @@ var cd3 = {
         cd3_object.cd3.d3yAxis.scale(cd3_object.cd3.d3yScale);
 
 
-        scope.updateTicks(cd3_object);
+
 
 
         cd3_object.cd3.d3parentSvg = cd3_object.attr("class", "cd3").append("svg");
@@ -278,107 +294,24 @@ var cd3 = {
 
             var series = cd3_object.selectAll(".series").append("g")
                 .attr("class", serie.type + " " + serie.source + " " + serie.cssClass);
-
-            switch (serie.type) {
-                default:
-                case "line":
-                    var line = d3.svg.line()
-                        .x(function (d, i) {
-                        return cd3_object.cd3.d3xScale(d[cd3_object.cd3.x.source]);
-                    })
-                        .y(function (d, i) {
-                        return cd3_object.cd3.d3yScale(d[serie.source]);
-                    });
-                    // Create path
-                    var path = series.selectAll("path")
-                        .data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : [cd3_object.cd3.data]);
-                    path.enter().append("path")
-                        .attr("d", line);
-
-                    break;
-                case "scatter":
-
-                    var circle = series.selectAll("circle");
-
-                    // Create circles
-                    circle = series.selectAll("circle")
-                        .data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data);
-                    circle.enter().append("circle")
-                        .attr("r", 2.5)
-                        .attr("cx", function (d) {
-                        return cd3_object.cd3.d3xScale(d[cd3_object.cd3.x.source]);
-                    })
-                        .attr("cy", function (d) {
-                        return cd3_object.cd3.d3yScale(d[serie.source]);
-                    });
-
-                    break;
-                case "column":
-                    var data = cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data;
-                    var colWidth = cd3_object.cd3.width / data.length;
-                    // Create columns (rectanlges)
-                    var column = series.selectAll("rect")
-                        .data(data);
-                    column.enter().append("rect")
-                        .attr("y", function (d) {
-                        return cd3_object.cd3.d3yScale(d[serie.source]);
-                    })
-                        .attr("x", function (d, i) {
-                        return (i * colWidth) + 1;
-                    })
-                        .attr("height", function (d) {
-                        return cd3_object.cd3.height - cd3_object.cd3.d3yScale(d[serie.source]);
-                    })
-                        .attr("width", colWidth - 2);
-
-                    break;
-
+            // paths need to be added in advance
+            if(serie.type=="line"){
+                series.append("path");
             }
             cd3_object.cd3.d3graphLegend.html(cd3_object.cd3.d3graphLegend.html() + "<span class=" + (serie.cssClass || serie.source) + ">" + (serie.title || "series" + index) + "</span>");
         });
 
-
+        scope.updateTicks(cd3_object);
         scope.list.push(cd3_object);
+        scope.redrawData(cd3_object);
         return cd3_object;
     },
     update: function (cd3_object, data) {
-
         var scope = this;
-        if (!data) {
-            return false;
-        }
-
-        //leave current dataset in situ
-        var oldData = cd3_object.cd3.data;
-        // copy array
-        var newData = data.slice();
-
-
-        // sort data if timeseries...
-        newData = scope.refactorData(cd3_object, newData);
-
-
-
-        //  through and replace items
-        var diff = newData.length - oldData.length
-        var checkLength = diff < 0 ? oldData.length += diff : oldData.length;
-        if (diff < 0) {
-            // remove items
-            diff *= -1;
-            oldData.splice(oldData.length - diff, diff);
-        } else if (diff > 0) {
-            //  add items
-            var newItems = newData.splice(newData.length - diff, diff);
-            newItems.forEach(function (item) {
-                oldData.push(item);
-            });
-        }
-        for (var i = 0; i < checkLength; i++) {
-            oldData[i] = newData[i];
-        }
-        scope.updateData(cd3_object);
+        cd3_object.cd3.data=data;
+        scope.redrawData(cd3_object);
     },
-    updateData: function (cd3_object) {
+    redrawData: function (cd3_object) {
         var scope = this;
 
         // update the domains (value ranges) for the axis
@@ -402,7 +335,9 @@ var cd3 = {
                     })
                         .y(function (d, i) {
                         return cd3_object.cd3.d3yScale(d[serie.source]);
-                    });
+                    });                  
+
+                    
                     //Update path positions
                     var path = series.selectAll("path")
                         .data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : [cd3_object.cd3.data])
@@ -503,6 +438,9 @@ var cd3 = {
             .duration(cd3_object.cd3.animate.duration)
             .ease(cd3_object.cd3.animate.ease)
             .call(cd3_object.cd3.d3xAxis);
+        
+        
+        scope.updateTicks(cd3_object);
     },
     resize: function () {
         var scope = cd3;
@@ -512,9 +450,8 @@ var cd3 = {
             }
             scope.updateDimensions(cd3_object);
             scope.updateRange(cd3_object, "x");
-            scope.updateRange(cd3_object, "y");
-            scope.updateScale(cd3_object);
-            scope.updateTicks(cd3_object);
+            scope.updateRange(cd3_object, "y");            
+            scope.updateScale(cd3_object);            
             scope.update(cd3_object, cd3_object.cd3.data);
         });
     }
