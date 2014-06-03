@@ -2,20 +2,10 @@
     overflow:hidden;
     position:relative; 
 }
-.cd3 .axis path, .cd3 .axis line {
-    fill: none;
-    stroke: #555555;
-    shape-rendering: crispEdges;
-}
 .cd3 .title {
     fill:black;
     font-size:14px;
     font-family:serif;
-}
-.cd3 .line {
-    fill: none;
-    stroke: black;
-    stroke-width: 1px;
 }
 .cd3 .legend {
     position: absolute;
@@ -25,13 +15,6 @@
 .cd3 .legend span {
     display:inline-block;
     margin-left:10px;
-}
-.cd3 path {
-    fill:none;
-}
-
-.cd3 .line.path {
-    fill:none;
 }
 .cd3 .overlay {
     fill: none;
@@ -54,4 +37,28 @@
     border-radius: 8px;
     pointer-events: none;
     color:lightgrey;
+}
+.cd3 .series path {
+    fill:none;
+}
+.cd3 g.series rect{
+    shape-rendering: crispEdges;    
+}
+.cd3 g.series path, .cd3 g.series circle{
+    shape-rendering: geometricPrecision;    
+}
+.cd3 .series1 {
+    stroke: #73AFF4;
+    color:#73AFF4;
+    fill:#73AFF4;
+}
+.cd3 .series2 {
+    stroke: #DA73F4;
+    color:#DA73F4;
+    fill:#DA73F4;
+}
+.cd3 .series3 {
+    stroke: #F47573;
+    color:#F47573;
+    fill:#F47573;
 }

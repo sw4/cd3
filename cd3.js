@@ -1,3 +1,8 @@
+// ==ClosureCompiler==
+// @output_file_name default.js
+// @compilation_level SIMPLE_OPTIMIZATIONS
+// ==/ClosureCompiler==
+
 var cd3 = {
     list: [],
     updateDomain: function (cd3_object, axis, domain) {
@@ -293,12 +298,12 @@ var cd3 = {
 
 
             var series = cd3_object.selectAll(".series").append("g")
-                .attr("class", serie.type + " " + serie.source + " " + serie.cssClass);
+                .attr("class", "series"+(index+1) + " " +serie.type + " " + serie.source + " " + serie.cssClass);
             // paths need to be added in advance
             if(serie.type=="line"){
                 series.append("path");
             }
-            cd3_object.cd3.d3graphLegend.html(cd3_object.cd3.d3graphLegend.html() + "<span class=" + (serie.cssClass || serie.source) + ">" + (serie.title || "series" + index) + "</span>");
+            cd3_object.cd3.d3graphLegend.html(cd3_object.cd3.d3graphLegend.html() + "<span class='series"+index+" "+serie.source +" " + serie.cssClass + "'>" + (serie.title || "series" + index) + "</span>");
         });
 
         scope.updateTicks(cd3_object);
