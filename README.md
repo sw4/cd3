@@ -9,6 +9,7 @@ Supported Chart Types
 2. Column
 3. Scatter
 
+And any mix of the above
 
 **[View Live Demo](http://jsfiddle.net/75UEt/15/)**
 
