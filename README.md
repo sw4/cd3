@@ -6,9 +6,9 @@ Reusable charting library for d3.js
 Supported Chart Types
 ---
 1. [Line](http://jsfiddle.net/75UEt/19/)
-2. [Column](http://jsfiddle.net/75UEt/21/)
-3. [Scatter (linear)](http://jsfiddle.net/75UEt/19/)
-4. [Scatter (ordinal)](http://jsfiddle.net/75UEt/20/)
+2. [Column](http://jsfiddle.net/75UEt/22/)
+3. [Scatter (linear)](http://jsfiddle.net/75UEt/23/)
+4. [Scatter (ordinal)](http://jsfiddle.net/75UEt/24/)
 5. [Mixed](http://jsfiddle.net/75UEt/18/)
 
 Features
