@@ -2,6 +2,11 @@
     overflow:hidden;
     position:relative; 
 }
+.cd3 .axis path, .cd3 .axis line {
+    fill: none;
+    stroke: #555555;
+    shape-rendering: crispEdges;
+}
 .cd3 .title {
     fill:black;
     font-size:14px;
