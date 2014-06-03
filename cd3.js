@@ -107,8 +107,8 @@ var cd3 = {
 
             var xPoint = cd3_object.cd3.d3xScale.invert(mouse[0]),
                 xPointIndex = scope.bisectData(cd3_object, xPoint),
-                startDatum = data[xPointIndex - 1],
-                endDatum = data[xPointIndex];
+                startDatum = cd3_object.cd3.data[xPointIndex - 1],
+                endDatum = cd3_object.cd3.data[xPointIndex];
 
             if (!startDatum || !endDatum) {
                 return false;
