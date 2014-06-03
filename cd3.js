@@ -11,7 +11,7 @@ var cd3 = {
             domain = cd3_object.cd3[axis].scale.domain;
         } else if (!domain && cd3_object.cd3[axis].scale && cd3_object.cd3[axis].scale.type == "ordinal") {
             // no domain passed or defined in initial chart config...if scale is ordinal..define categories
-            domain = data.map(function (d) {
+            domain = cd3_object.cd3.data.map(function (d) {
                 return d[cd3_object.cd3[axis].source];
             })
         } else if (!domain) {
