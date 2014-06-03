@@ -29,6 +29,7 @@
 .cd3 path {
     fill:none;
 }
+
 .cd3 .line.path {
     fill:none;
 }
@@ -37,8 +38,8 @@
     pointer-events: all;
     z-index:9999;
 }
-.cd3 .tip {
-    fill:white;
+.cd3 .tip{
+    fill:black;
     pointer-events:none;
     stroke:black;
     stroke-width:0px;
