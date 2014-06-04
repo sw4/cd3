@@ -360,7 +360,7 @@ var cd3 = {
                     } else {
                         dimension = cd3_object.cd3.y.scale.type == "ordinal" ? cd3_object.cd3.d3yScale.rangeBand() : cd3_object.cd3.height / data.length;
                     }
-
+                    dimension = dimension < 2 ? 2 : dimension;
                     var rect = series.selectAll("rect");
                     //Update bars/columns positions
                     rect.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
