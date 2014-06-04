@@ -87,6 +87,7 @@ cd3.chart({
         source: "value1", //required (string), key to use for series in data
         category: "category1", // required if 'type=pie' (string), key to use for categories in data
         cssClass: "myFirstSeries" // optional (string), CSS class to give line, defaults to series source,
+        color: "red", // (string) color to be used for the series, can be any svg format (HEX, shorthand, RGB etc), overridden by cssClass
         title: "series title" // (string) text to refer to the series by in legend/tooltips
     }]
 });
