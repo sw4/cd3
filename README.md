@@ -19,7 +19,7 @@ Features
 1. Simple reusable charting, leveraging d3
 2. Automatic time series support
 3. Automatic animated chart rescaling on container resize & data update
-4. Exposes underlying d3 structure for more complext manipulation
+4. Exposes underlying d3 structure for more complex manipulation
 
 Requirements
 ---
