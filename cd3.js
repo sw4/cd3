@@ -287,7 +287,12 @@ var cd3 = {
                     .attr("class", "series" + index + " " + serie.type + " " + serie.source + " " + serie.cssClass)
                     .attr("stroke", serie.color);
             }
-            cd3_object.cd3.d3graphLegend.html(cd3_object.cd3.d3graphLegend.html() + "<span class='series" + index + " " + serie.source + " " + serie.cssClass + "'>" + (serie.title || "series" + index) + "</span>");
+            cd3_object.cd3.d3graphLegend && cd3_object.cd3.d3graphLegend
+                .append('span')
+                .attr("class","series" + index + " " + serie.type + " " + serie.source + " " + serie.cssClass)
+                .style("color",serie.color)
+                .html((serie.title || "series" + index));
+               
         });
 
         scope.updateTicks(cd3_object);
@@ -330,8 +335,12 @@ var cd3 = {
         cd3_object.cd3.d3parentSvg = cd3_object.attr("class", "cd3").append("svg");
         cd3_object.cd3.d3graphSvg = cd3_object.cd3.d3parentSvg.append("g").attr("class", "chart").attr("position", "relative");
 
-        cd3_object.cd3.d3graphTitle = cd3_object.cd3.title ? cd3_object.cd3.d3parentSvg.append("text").text(cd3_object.cd3.title) : null;
-        cd3_object.cd3.d3graphLegend = cd3_object.append("div").attr("class", "legend");
+        if(cd3_object.cd3.title){
+            cd3_object.cd3.d3graphTitle = cd3_object.cd3.d3parentSvg.append("text").text(cd3_object.cd3.title);        
+        }
+        if(cd3_object.cd3.legend){
+            cd3_object.cd3.d3graphLegend = cd3_object.append("div").attr("class", "legend");      
+        }        
         cd3_object.cd3.d3graphSvg.append("g").attr("class", "series");
         if (cd3_object.cd3.tips) {
             scope.tips(cd3_object);
