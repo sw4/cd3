@@ -24,8 +24,6 @@ var cd3 = {
     },
     updateRange: function (cd3_object, axis, range) {
         var scale = axis === "x" ? cd3_object.cd3.d3xScale : cd3_object.cd3.d3yScale;
-
-
         //range can be directly passed, read from the config, or interpreted automatically
         if (!range && cd3_object.cd3[axis].scale && cd3_object.cd3[axis].scale.range) {
             // no range passed, one defined in initial chart config...so use that
@@ -34,6 +32,8 @@ var cd3 = {
             // no range passed or defined in initial chart config...if scale is ordinal..range bands (column) or points (scatter)
             if (cd3_object.cd3.series.length > 0 && cd3_object.cd3.series[0].type == "column") {
                 scale.rangeBands([0, cd3_object.cd3.width]);
+            } else if (cd3_object.cd3.series.length > 0 && cd3_object.cd3.series[0].type == "bar") {
+                scale.rangeBands([0, cd3_object.cd3.height]);
             } else {
                 scale.rangePoints([0, cd3_object.cd3.width]);
             }
@@ -43,18 +43,17 @@ var cd3 = {
         }
     },
     updateTicks: function (cd3_object) {
-        
-        function orientTicks(axis){
-            var rotate=cd3_object.cd3[axis].axis && cd3_object.cd3[axis].axis.ticks && cd3_object.cd3[axis].axis.ticks.rotate || 0,
-            top=cd3_object.cd3[axis].axis && cd3_object.cd3[axis].axis.ticks && cd3_object.cd3[axis].axis.ticks.top || null,
-            ticks= axis == "x"?cd3_object.cd3.d3graphXAxis.selectAll(".tick text") :cd3_object.cd3.d3graphYAxis.selectAll(".tick text");
-            ticks
-                .attr("transform", function(d) {
-                    return "rotate("+rotate+")" 
-                });
-            top && ticks.attr("dy", top);            
+
+        function orientTicks(axis) {
+            var rotate = cd3_object.cd3[axis].axis && cd3_object.cd3[axis].axis.ticks && cd3_object.cd3[axis].axis.ticks.rotate || 0,
+                top = cd3_object.cd3[axis].axis && cd3_object.cd3[axis].axis.ticks && cd3_object.cd3[axis].axis.ticks.top || null,
+                ticks = axis == "x" ? cd3_object.cd3.d3graphXAxis.selectAll(".tick text") : cd3_object.cd3.d3graphYAxis.selectAll(".tick text");
+            ticks.attr("transform", function (d) {
+                return "rotate(" + rotate + ")"
+            });
+            top && ticks.attr("dy", top);
         }
-        
+
         cd3_object.cd3.d3yAxis.ticks(Math.max(cd3_object.cd3.height / 20, 2));
         orientTicks("x");
         cd3_object.cd3.d3xAxis.ticks(Math.max(cd3_object.cd3.width / 130, 2));
@@ -255,6 +254,9 @@ var cd3 = {
             case "linear":
                 cd3_object.cd3.d3yScale = d3.scale.linear();
                 break;
+            case "ordinal":
+                cd3_object.cd3.d3yScale = d3.scale.ordinal();
+                break;
         }
 
 
@@ -293,12 +295,12 @@ var cd3 = {
 
 
             var series = cd3_object.selectAll(".series").append("g")
-                .attr("class", "series"+(index+1) + " " +serie.type + " " + serie.source + " " + serie.cssClass);
+                .attr("class", "series" + (index + 1) + " " + serie.type + " " + serie.source + " " + serie.cssClass);
             // paths need to be added in advance
-            if(serie.type=="line"){
+            if (serie.type == "line") {
                 series.append("path");
             }
-            cd3_object.cd3.d3graphLegend.html(cd3_object.cd3.d3graphLegend.html() + "<span class='series"+index+" "+serie.source +" " + serie.cssClass + "'>" + (serie.title || "series" + index) + "</span>");
+            cd3_object.cd3.d3graphLegend.html(cd3_object.cd3.d3graphLegend.html() + "<span class='series" + index + " " + serie.source + " " + serie.cssClass + "'>" + (serie.title || "series" + index) + "</span>");
         });
 
         scope.updateTicks(cd3_object);
@@ -308,7 +310,7 @@ var cd3 = {
     },
     update: function (cd3_object, data) {
         var scope = this;
-        cd3_object.cd3.data=data;
+        cd3_object.cd3.data = data;
         scope.redrawData(cd3_object);
     },
     redrawData: function (cd3_object) {
@@ -335,9 +337,9 @@ var cd3 = {
                     })
                         .y(function (d, i) {
                         return cd3_object.cd3.d3yScale(d[serie.source]);
-                    });                  
+                    });
 
-                    
+
                     //Update path positions
                     var path = series.selectAll("path")
                         .data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : [cd3_object.cd3.data])
@@ -347,47 +349,57 @@ var cd3 = {
                         .attr("d", line);
 
                     break;
+                case "bar":
                 case "column":
 
+                    // define dimensions (height for bar, width for column)
+                    var dimension = 0;
+                    // give dimensio value depending on nautre of chart and scale
+                    if (serie.type == "column") {
+                        dimension = cd3_object.cd3.x.scale.type == "ordinal" ? cd3_object.cd3.d3xScale.rangeBand() : cd3_object.cd3.width / data.length;
+                    } else {
+                        dimension = cd3_object.cd3.y.scale.type == "ordinal" ? cd3_object.cd3.d3yScale.rangeBand() : cd3_object.cd3.height / data.length;
+                    }
 
-                    var data = cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data;
-                    var colWidth = cd3_object.cd3.width / data.length;
-                    var column = series.selectAll("rect");
-
-                    //Update columns positions
-                    column.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
+                    var rect = series.selectAll("rect");
+                    //Update bars/columns positions
+                    rect.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
                         .transition()
                         .duration(cd3_object.cd3.animate.duration)
                         .ease(cd3_object.cd3.animate.ease)
-                        .attr("y", function (d) {
-                        return cd3_object.cd3.d3yScale(d[serie.source]);
+                        .attr("y", function (d, i) {
+                        return serie.type == "column" ? cd3_object.cd3.d3yScale(d[serie.source]) : (i * dimension) + 1;
                     })
                         .attr("x", function (d, i) {
-                        return (i * colWidth) + 1;
+                        return serie.type == "column" ? (i * dimension) + 1 : 0;
                     })
                         .attr("height", function (d) {
-                        return cd3_object.cd3.height - cd3_object.cd3.d3yScale(d[serie.source]);
+                        return serie.type == "column" ? cd3_object.cd3.height - cd3_object.cd3.d3yScale(d[serie.source]) : dimension - 2;
                     })
-                        .attr("width", colWidth - 2);
+                        .attr("width", function (d) {
+                        return serie.type == "column" ? dimension - 2 : cd3_object.cd3.width - cd3_object.cd3.d3xScale(d[serie.source]);
+                    });
 
 
-                    //Add new columns
-                    column.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
+                    //Add new bars/columns
+                    rect.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
                         .enter()
                         .append("rect")
-                        .attr("y", function (d) {
-                        return cd3_object.cd3.d3yScale(d[serie.source]);
+                        .attr("y", function (d, i) {
+                        return serie.type == "column" ? cd3_object.cd3.d3yScale(d[serie.source]) : (i * dimension) + 1;
                     })
                         .attr("x", function (d, i) {
-                        return (i * colWidth) + 1;
+                        return serie.type == "column" ? (i * dimension) + 1 : 0;
                     })
                         .attr("height", function (d) {
-                        return cd3_object.cd3.height - cd3_object.cd3.d3yScale(d[serie.source]);
+                        return serie.type == "column" ? cd3_object.cd3.height - cd3_object.cd3.d3yScale(d[serie.source]) : dimension - 2;
                     })
-                        .attr("width", colWidth - 2);
+                        .attr("width", function (d) {
+                        return serie.type == "column" ? dimension - 2 : cd3_object.cd3.width - cd3_object.cd3.d3xScale(d[serie.source]);
+                    });
 
-                    // Remove old columns
-                    column.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
+                    // Remove old bars/columns
+                    rect.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
                         .exit().remove();
 
                     break;
@@ -429,6 +441,7 @@ var cd3 = {
 
         });
         // redraw the axes..
+
         cd3_object.cd3.d3graphYAxis.transition()
             .duration(cd3_object.cd3.animate.duration)
             .ease(cd3_object.cd3.animate.ease)
@@ -438,8 +451,8 @@ var cd3 = {
             .duration(cd3_object.cd3.animate.duration)
             .ease(cd3_object.cd3.animate.ease)
             .call(cd3_object.cd3.d3xAxis);
-        
-        
+
+
         scope.updateTicks(cd3_object);
     },
     resize: function () {
@@ -450,8 +463,8 @@ var cd3 = {
             }
             scope.updateDimensions(cd3_object);
             scope.updateRange(cd3_object, "x");
-            scope.updateRange(cd3_object, "y");            
-            scope.updateScale(cd3_object);            
+            scope.updateRange(cd3_object, "y");
+            scope.updateScale(cd3_object);
             scope.update(cd3_object, cd3_object.cd3.data);
         });
     }
