@@ -122,19 +122,27 @@ cd3.chart({
 CSS
 ----
 
-Prefix all related classes with `.cd3` or your a chart container attribute (id, class etc) to ensure speficity. The `cd3` class is applied to the top level container the chart is applied to.
+The `cd3` class is applied to the top level container the chart is applied to. Series/category colors are randomly generated at runtime by default, but can be defined either in the initial configuration or your CSS.
+
+
+**Legend**
+
+Legend container:
 
 `.legend`
 
-Style legend
+Each series is represented in the legend container by a `span` containing the series title. Each `span` is given the following classes by default:
 
-`.legend span`
+`series[n]`
+Where `[n]` is the index of the series (based at 1)
 
-Style legend items
+`[source]`
+Where `[source]` is the `source` attribute of the series in the chart config
 
-`.legend .seriesClass`
+`[cssClass]`
+Where `[cssClass]` is the `cssClass` attribute of the series in the chart config
 
-Style legend item for a specific series, where seriesClass is the name of a class defined in a chart->series config
+
 
 `.title`
 
