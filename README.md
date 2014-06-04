@@ -164,12 +164,12 @@ Where `[[x/y]]` is the axis (x or y) you wish to style. Can be styled using svg 
 Style axis ticks, contains both the tick line (`.tick line`) and tick text (`.tick text`). Can be styled using svg attributes
 
 
-**Series**
+**Series (line, bar, column, scatter)**
 
 Each series is given the following classes by default:
 
 `series[n]`
-Where `[n]` is the index of the series (based at 1)
+Where `[n]` is the index of the series (based at zero)
 
 `[type]`
 Where `[type]` is the `type` attribute of the series in the chart config (line, pie, bar etc)
@@ -181,6 +181,23 @@ Where `[source]` is the `source` attribute of the series in the chart config
 Where `[cssClass]` is the `cssClass` attribute of the series in the chart config if present
 
 As such, you can target series by type, data source or order.
+
+**Categories (pie)**
+
+Each category (slice) is given the following classes by default:
+
+`series0`
+
+`pie`
+
+`[source]`
+Where `[source]` is the `source` attribute of the series in the chart config
+
+`[cssClass]`
+Where `[cssClass]` is the `cssClass` attribute of the series in the chart config if present
+
+`category[n]`
+Where `[n]` is the index of the category (based at zero)
 
 
 Sample Linear (time) Dataset
