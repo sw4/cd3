@@ -284,9 +284,7 @@ var cd3 = {
             if (serie.type == "line") {
                 series
                     .append("path")
-                    .attr("stroke", function (d, i) {
-                        return scope.stringToColor("series" + (index + 1));
-                    });
+                    .attr("stroke", serie.color);
             }
             cd3_object.cd3.d3graphLegend.html(cd3_object.cd3.d3graphLegend.html() + "<span class='series" + index + " " + serie.source + " " + serie.cssClass + "'>" + (serie.title || "series" + index) + "</span>");
         });
@@ -323,6 +321,11 @@ var cd3 = {
             cd3_object.cd3.resampling = true;
         }
 
+        cd3_object.cd3.series.forEach(function(serie, index){
+            if(!serie.color){serie.color=scope.stringToColor("series"+(index+1));}
+        });
+        
+        
         cd3_object.cd3.d3parentSvg = cd3_object.attr("class", "cd3").append("svg");
         cd3_object.cd3.d3graphSvg = cd3_object.cd3.d3parentSvg.append("g").attr("class", "chart").attr("position", "relative");
 
@@ -333,7 +336,6 @@ var cd3 = {
             scope.tips(cd3_object);
         }
         scope.updateDimensions(cd3_object);
-
         cd3_object.cd3.series[0].type == "pie" ? scope.buildPie(cd3_object) : scope.buildPlot(cd3_object);
 
         scope.list.push(cd3_object);
@@ -432,7 +434,7 @@ var cd3 = {
                             dimension = cd3_object.cd3.y.scale.type == "ordinal" ? cd3_object.cd3.d3yScale.rangeBand() : cd3_object.cd3.height / data.length;
                         }
                         dimension = dimension < 2 ? 2 : dimension;
-                        var rect = series.selectAll("rect"), color=scope.stringToColor("series" + (index+1));
+                        var rect = series.selectAll("rect");
                         //Update bars/columns positions
                         rect.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
                             .transition()
@@ -456,7 +458,7 @@ var cd3 = {
                         rect.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
                             .enter()
                             .append("rect")
-                            .attr("fill", color)
+                            .attr("fill", serie.color)
                             .attr("y", function (d, i) {
                             return serie.type == "column" ? cd3_object.cd3.d3yScale(d[serie.source]) : (i * dimension) + 1;
                         })
@@ -477,7 +479,7 @@ var cd3 = {
                         break;
                     case "scatter":
 
-                        var circle = series.selectAll("circle"), color=scope.stringToColor("series" + (index+1));
+                        var circle = series.selectAll("circle");
 
                         //Update circle positions
                         circle.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
@@ -495,8 +497,8 @@ var cd3 = {
                         circle.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
                             .enter()
                             .append("circle")
-                            .attr("fill", color)
-                            .attr("stroke", color)
+                            .attr("fill", serie.color)
+                            .attr("stroke", serie.color)
                             .attr("cx", function (d) {
                             return cd3_object.cd3.d3xScale(d[cd3_object.cd3.x.source]);
                         })
