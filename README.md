@@ -7,7 +7,7 @@ Supported Chart Types
 ---
 1. [Line](http://jsfiddle.net/75UEt/19/)
 2. [Column](http://jsfiddle.net/75UEt/27/)
-3. [Bar](http://jsfiddle.net/75UEt/30/)
+3. [Bar](http://jsfiddle.net/75UEt/31/)
 4. [Scatter (linear)](http://jsfiddle.net/75UEt/23/)
 5. [Scatter (ordinal)](http://jsfiddle.net/75UEt/28/)
 6. [Mixed](http://jsfiddle.net/75UEt/18/)
