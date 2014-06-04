@@ -179,6 +179,8 @@ Where `[cssClass]` is the `cssClass` attribute of the series in the chart config
 `category[n]`
 Where `[n]` is the index of the category (based at zero)
 
+`[categoryValue]`
+Where `[categoryValue]` is the value of the category as it appears in the data source
 
 Sample Linear (time) Dataset
 ----
