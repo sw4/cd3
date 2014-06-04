@@ -31,7 +31,7 @@ Methods
 
 `cd3.chart(options)`
 
-Create a new cd3 chart returns cd3 chart object (cd3chart)
+Create a new cd3 chart, returns cd3 chart object (cd3chart)
 
 `cd3.update(cd3chart, data)`
 
