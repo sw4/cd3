@@ -9,8 +9,7 @@
 }
 .cd3 .title {
     fill:black;
-    font-size:14px;
-    font-family:serif;
+    font-size:1.2em;
 }
 .cd3 .legend {
     position: absolute;
