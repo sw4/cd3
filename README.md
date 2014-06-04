@@ -129,7 +129,7 @@ The `cd3` class is applied to the top level container the chart is applied to. S
 
 Legend container:
 
-`.legend`
+(div)`.legend`
 
 Each series is represented in the legend container by a `span` containing the series title. Each `span` is given the following classes by default:
 
@@ -140,43 +140,50 @@ Where `[n]` is the index of the series (based at 1)
 Where `[source]` is the `source` attribute of the series in the chart config
 
 `[cssClass]`
-Where `[cssClass]` is the `cssClass` attribute of the series in the chart config
+Where `[cssClass]` is the `cssClass` attribute of the series in the chart config if present
 
 
+**Title**
 
-`.title`
+(text)`.title`
 
-Style title
+The title can be styled using svg attributes such as `stroke`, `fill` etc
 
-`.axis`
+**Axes**
 
-Style axes
+(g)`.axis`
 
-`.x.axis`
+Top level axes selector, axes can be styled using svg attributes
 
-Style X axis
+(g)`.[x/y].axis`
 
-`.y.axis`
+Where `[[x/y]]` is the axis (x or y) you wish to style. Can be styled using svg attributes
 
-Style Y axis
+(g)`.tick`
 
-`.[x/y].axis .tick`
+Style axis ticks, contains both the tick line (`.tick line`) and tick text (`.tick text`). Can be styled using svg attributes
 
-Style X/Y axis ticks
 
-`.path`
+**Series**
 
-Style paths
+Each series is given the following classes by default:
 
-`.line`
+`series[n]`
+Where `[n]` is the index of the series (based at 1)
 
-Style lines
+`[type]`
+Where `[type]` is the `type` attribute of the series in the chart config (line, pie, bar etc)
 
-`.cd3 .seriesClass`
+`[source]`
+Where `[source]` is the `source` attribute of the series in the chart config
 
-Style a series, where seriesClass is the name of a class defined in a chart->series config (affects all related lines, tooltip markers, and legend)
+`[cssClass]`
+Where `[cssClass]` is the `cssClass` attribute of the series in the chart config if present
 
-Sample Dataset
+As such, you can target series by type, data source or order.
+
+
+Sample Linear (time) Dataset
 ----
 
 ```
