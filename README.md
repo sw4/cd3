@@ -21,6 +21,11 @@ Features
 3. Automatic animated chart rescaling on container resize & data update
 4. Exposes underlying d3 structure for more complext manipulation
 
+Requirements
+---
+d3.js (tested for 3.0.4), cd3 javscript and CSS.
+
+
 Methods
 ===
 
