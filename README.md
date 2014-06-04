@@ -50,7 +50,7 @@ cd3.chart({
     },
     data: data, // required (object array), series data
     margin: 50, // optional (int/object) either a number or an object of top/left/bottom/right
-    x: { // required (object)
+    x: { // required for plots (not pie/donut charts) (object)
         scale: { // optional
             type: "time", // optional (string), defaults to linear
             format: "%I:%M:%S", // optional (string), determines format of tick marks
@@ -66,7 +66,7 @@ cd3.chart({
         },
         source: "time" // required (string) specifies key in data to be used for axis
     },
-    y: { // required (object)
+    y: { // required for plots (not pie/donut charts) (object)
         scale: { // optional
             type: null, // optional (string), defaults to linear
             domain: [0, 20], // optional (array), defaults to min/max of given source field in [data]
@@ -82,9 +82,10 @@ cd3.chart({
         source: "value1" // required (string) only if y->scale->domain not specified,  specifies key in data to be used for axis
     },
     series: [{ //required (object)
-        type: "line", //required (string) can be either "line", "column" or "scatter"
+        type: "line", //required (string) can be either "line", "column", "bar", "pie" or "scatter"
         title: "First Series", //optional (string), defaults to series*index*, e.g. 'series0'
         source: "value1", //required (string), key to use for series in data
+        category: "category1", // required if 'type=pie' (string), key to use for categories in data
         cssClass: "myFirstSeries" // optional (string), CSS class to give line, defaults to series source,
         title: "series title" // (string) text to refer to the series by in legend/tooltips
     }]
