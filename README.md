@@ -41,7 +41,7 @@ Update an existing cd3 chart object (cd3chart) with a new dataset
 Configuration
 ====
 
-```
+```javascript
 cd3.chart({
     selector: "#chart", // required (string), can be any kind of valid 'd3.select' selector
     title: "My Chart", // optional (string), title text to be added to the chart (appears top center)
@@ -185,7 +185,7 @@ Where `[categoryValue]` is the value of the category as it appears in the data s
 Sample Linear (time) Dataset
 ----
 
-```
+```javascript
 [{
     "time": 1401446958259,
         "value1": 4,
