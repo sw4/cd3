@@ -82,12 +82,7 @@ var cd3 = {
         return bisect(cd3_object.cd3.data, xPoint);
     },
     updateScale: function (cd3_object) {
-        cd3_object.cd3.d3parentSvg.attr("width", cd3_object.cd3.width + cd3_object.cd3.margin.left + cd3_object.cd3.margin.right)
-            .attr("height", cd3_object.cd3.height + cd3_object.cd3.margin.top + cd3_object.cd3.margin.bottom);
 
-        cd3_object.cd3.d3graphSvg.attr("width", cd3_object.cd3.width)
-            .attr("height", cd3_object.cd3.height)
-            .attr("transform", "translate(" + cd3_object.cd3.margin.left + "," + cd3_object.cd3.margin.top + ")");
 
         cd3_object.cd3.d3graphXAxis.attr("class", "x axis")
             .attr("transform", "translate(0," + cd3_object.cd3.height + ")")
@@ -96,8 +91,10 @@ var cd3 = {
         cd3_object.cd3.d3graphYAxis.attr("class", "y axis")
             .call(cd3_object.cd3.d3yAxis);
 
-        cd3_object.cd3.d3graphTitle && cd3_object.cd3.d3graphTitle.attr("x", (cd3_object.cd3.width / 2))
-            .attr("y", (cd3_object.cd3.margin.top / 2)).attr("class", "title");
+
+    },
+    updateSizing: function (cd3_object) {
+
     },
     updateDimensions: function (cd3_object) {
         cd3_object.cd3.width = parseInt(cd3_object.style("width"));
@@ -115,6 +112,16 @@ var cd3 = {
         cd3_object.cd3.height = cd3_object.cd3.height - cd3_object.cd3.margin.top - cd3_object.cd3.margin.bottom;
 
         cd3_object.cd3.tips && cd3_object.cd3.d3TipOverlay && cd3_object.cd3.d3TipOverlay.attr("width", cd3_object.cd3.width).attr("height", cd3_object.cd3.height);
+
+        cd3_object.cd3.d3parentSvg.attr("width", cd3_object.cd3.width + cd3_object.cd3.margin.left + cd3_object.cd3.margin.right)
+            .attr("height", cd3_object.cd3.height + cd3_object.cd3.margin.top + cd3_object.cd3.margin.bottom);
+
+        cd3_object.cd3.d3graphSvg.attr("width", cd3_object.cd3.width)
+            .attr("height", cd3_object.cd3.height)
+            .attr("transform", "translate(" + cd3_object.cd3.margin.left + "," + cd3_object.cd3.margin.top + ")");
+
+        cd3_object.cd3.d3graphTitle && cd3_object.cd3.d3graphTitle.attr("x", (cd3_object.cd3.width / 2))
+            .attr("y", (cd3_object.cd3.margin.top / 2)).attr("class", "title");
     },
     tips: function (cd3_object) {
         var scope = this,
@@ -181,38 +188,23 @@ var cd3 = {
             cd3_object.cd3.d3TipInfo.html(tipInfo);
         });
     },
-    chart: function (config) {
-        //define scope
+    buildPlot: function (cd3_object) {
         var scope = this;
-        // define cd3 object
-        var cd3_object = d3.select(config.selector);
-        // apply passed configuration to object as cd3 property
-        cd3_object.cd3 = config;
-
-        // firstly set any defaults on the passed config... if missing
+        var axes = cd3_object.cd3.d3graphSvg.append("g").attr("class", "axes");
 
         // redefine and sort data if timescale being used
         scope.refactorData(cd3_object);
 
-        // set up any missing animation properties
-        if (!cd3_object.cd3.animate || !cd3_object.cd3.animate.ease) {
-            cd3_object.cd3.animate.ease = "linear";
-        }
-        if (!cd3_object.cd3.animate || cd3_object.cd3.animate.duration === null) {
-            cd3_object.cd3.animate.duration = 200;
-        }
-        // set resampling
-        if (cd3_object.cd3.resampling === null) {
-            cd3_object.cd3.resampling = true;
-        }
 
-        scope.updateDimensions(cd3_object);
+        cd3_object.cd3.d3graphXAxis = axes.append("g");
+        cd3_object.cd3.d3graphYAxis = axes.append("g");
 
         // define d3 objects for x & y axis
         cd3_object.cd3.d3xScale = {},
         cd3_object.cd3.d3yScale = {},
         cd3_object.cd3.d3xAxis = d3.svg.axis(),
         cd3_object.cd3.d3yAxis = d3.svg.axis();
+
 
         // build d3 x axis scale
         switch (cd3_object.cd3.x.scale.type) {
@@ -268,27 +260,6 @@ var cd3 = {
         cd3_object.cd3.d3yAxis.scale(cd3_object.cd3.d3yScale);
 
 
-
-
-
-        cd3_object.cd3.d3parentSvg = cd3_object.attr("class", "cd3").append("svg");
-        cd3_object.cd3.d3graphSvg = cd3_object.cd3.d3parentSvg.append("g").attr("class", "chart").attr("position", "relative");
-        var axes = cd3_object.cd3.d3graphSvg.append("g").attr("class", "axes");
-        cd3_object.cd3.d3graphXAxis = axes.append("g");
-        cd3_object.cd3.d3graphYAxis = axes.append("g");
-        cd3_object.cd3.d3graphTitle = cd3_object.cd3.title ? cd3_object.cd3.d3parentSvg.append("text").text(cd3_object.cd3.title) : null;
-        cd3_object.cd3.d3graphLegend = cd3_object.append("div").attr("class", "legend");
-
-
-        cd3_object.cd3.d3graphSvg.append("g").attr("class", "series");
-
-
-        if (cd3_object.cd3.tips) {
-            scope.tips(cd3_object);
-        }
-
-
-
         scope.updateScale(cd3_object);
 
         cd3_object.cd3.series.forEach(function (serie, index) {
@@ -304,6 +275,50 @@ var cd3 = {
         });
 
         scope.updateTicks(cd3_object);
+    },
+    buildPie: function (cd3_object) {
+
+        cd3_object.cd3.d3graphSvg.select("g .series")
+            .append("g")
+            .attr("class", "series0 pie " + cd3_object.cd3.series[0].source + " " + cd3_object.cd3.series[0].cssClass);
+
+    },
+    chart: function (config) {
+
+        //define scope
+        var scope = this;
+        // define cd3 object
+        var cd3_object = d3.select(config.selector);
+        // apply passed configuration to object as cd3 property
+        cd3_object.cd3 = config;
+
+        // firstly set any defaults on the passed config... if missing
+
+        // set up any missing animation properties
+        if (!cd3_object.cd3.animate || !cd3_object.cd3.animate.ease) {
+            cd3_object.cd3.animate.ease = "linear";
+        }
+        if (!cd3_object.cd3.animate || cd3_object.cd3.animate.duration === null) {
+            cd3_object.cd3.animate.duration = 200;
+        }
+        // set resampling
+        if (cd3_object.cd3.resampling === null) {
+            cd3_object.cd3.resampling = true;
+        }
+
+        cd3_object.cd3.d3parentSvg = cd3_object.attr("class", "cd3").append("svg");
+        cd3_object.cd3.d3graphSvg = cd3_object.cd3.d3parentSvg.append("g").attr("class", "chart").attr("position", "relative");
+
+        cd3_object.cd3.d3graphTitle = cd3_object.cd3.title ? cd3_object.cd3.d3parentSvg.append("text").text(cd3_object.cd3.title) : null;
+        cd3_object.cd3.d3graphLegend = cd3_object.append("div").attr("class", "legend");
+        cd3_object.cd3.d3graphSvg.append("g").attr("class", "series");
+        if (cd3_object.cd3.tips) {
+            scope.tips(cd3_object);
+        }
+        scope.updateDimensions(cd3_object);
+
+        cd3_object.cd3.series[0].type == "pie" ? scope.buildPie(cd3_object) : scope.buildPlot(cd3_object);
+
         scope.list.push(cd3_object);
         scope.redrawData(cd3_object);
         return cd3_object;
@@ -315,145 +330,185 @@ var cd3 = {
     },
     redrawData: function (cd3_object) {
         var scope = this;
+        if (cd3_object.cd3.series[0].type == "pie") {
 
-        // update the domains (value ranges) for the axis
+            var series = cd3_object.select("g.series g.pie");
+            var radius = Math.min(cd3_object.cd3.width, cd3_object.cd3.height) / 2;
 
-        scope.updateDomain(cd3_object, "x");
-        scope.updateDomain(cd3_object, "y");
+            var color = d3.scale.category20c();
+            
+            cd3_object.cd3.d3graphSvg.select("g .series .pie")
+                .attr("transform", "translate(" + (cd3_object.cd3.width - cd3_object.cd3.margin.left) / 2 + "," + cd3_object.cd3.height / 2 + ")");
 
+            var arc = d3.svg.arc().outerRadius(radius);
 
-        // loop through each series and redraw
-        cd3_object.cd3.series.forEach(function (serie) {
+            var pie = d3.layout.pie().value(function (d) {
+                return d[cd3_object.cd3.series[0].source];
+            });
+            
+            var slice = series.selectAll("path.slice");
+            
+            //Update slice positions
+            slice.data(pie(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data))
+                .transition()
+                .duration(cd3_object.cd3.animate.duration)
+                .ease(cd3_object.cd3.animate.ease)
+                .attr("d", arc);            
 
-            var series = cd3_object.select("g." + serie.type + "." + serie.source);
+            //Add new slices
+            slice.data(pie(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data))
+            .enter()
+            .append("svg:path")
+            .attr("fill", function (d, i) {
+                return color(i);
+            })
+            .attr("d", arc)
+            .each(function(d) { this._current = d; })
+            .attr("class", function (d, i) {
+                return "slice category" + i + " " + d.data[cd3_object.cd3.series[0].category];
+            }); 
+            // Remove old slices            
+            slice.data(pie(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data))
+            .exit().remove();  
+        } else {
+            // update the domains (value ranges) for the axis
 
-            switch (serie.type) {
-                default:
-                case "line":
-
-                    var line = d3.svg.line()
-                        .x(function (d, i) {
-                        return cd3_object.cd3.d3xScale(d[cd3_object.cd3.x.source]);
-                    })
-                        .y(function (d, i) {
-                        return cd3_object.cd3.d3yScale(d[serie.source]);
-                    });
-
-
-                    //Update path positions
-                    var path = series.selectAll("path")
-                        .data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : [cd3_object.cd3.data])
-                        .transition()
-                        .duration(cd3_object.cd3.animate.duration)
-                        .ease(cd3_object.cd3.animate.ease)
-                        .attr("d", line);
-
-                    break;
-                case "bar":
-                case "column":
-
-                    // define dimensions (height for bar, width for column)
-                    var dimension = 0;
-                    // give dimensio value depending on nautre of chart and scale
-                    if (serie.type == "column") {
-                        dimension = cd3_object.cd3.x.scale.type == "ordinal" ? cd3_object.cd3.d3xScale.rangeBand() : cd3_object.cd3.width / data.length;
-                    } else {
-                        dimension = cd3_object.cd3.y.scale.type == "ordinal" ? cd3_object.cd3.d3yScale.rangeBand() : cd3_object.cd3.height / data.length;
-                    }
-                    dimension = dimension < 2 ? 2 : dimension;
-                    var rect = series.selectAll("rect");
-                    //Update bars/columns positions
-                    rect.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
-                        .transition()
-                        .duration(cd3_object.cd3.animate.duration)
-                        .ease(cd3_object.cd3.animate.ease)
-                        .attr("y", function (d, i) {
-                        return serie.type == "column" ? cd3_object.cd3.d3yScale(d[serie.source]) : (i * dimension) + 1;
-                    })
-                        .attr("x", function (d, i) {
-                        return serie.type == "column" ? (i * dimension) + 1 : 0;
-                    })
-                        .attr("height", function (d) {
-                        return serie.type == "column" ? cd3_object.cd3.height - cd3_object.cd3.d3yScale(d[serie.source]) : dimension - 2;
-                    })
-                        .attr("width", function (d) {
-                        return serie.type == "column" ? dimension - 2 : cd3_object.cd3.width - cd3_object.cd3.d3xScale(d[serie.source]);
-                    });
+            scope.updateDomain(cd3_object, "x");
+            scope.updateDomain(cd3_object, "y");
 
 
-                    //Add new bars/columns
-                    rect.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
-                        .enter()
-                        .append("rect")
-                        .attr("y", function (d, i) {
-                        return serie.type == "column" ? cd3_object.cd3.d3yScale(d[serie.source]) : (i * dimension) + 1;
-                    })
-                        .attr("x", function (d, i) {
-                        return serie.type == "column" ? (i * dimension) + 1 : 0;
-                    })
-                        .attr("height", function (d) {
-                        return serie.type == "column" ? cd3_object.cd3.height - cd3_object.cd3.d3yScale(d[serie.source]) : dimension - 2;
-                    })
-                        .attr("width", function (d) {
-                        return serie.type == "column" ? dimension - 2 : cd3_object.cd3.width - cd3_object.cd3.d3xScale(d[serie.source]);
-                    });
+            // loop through each series and redraw
+            cd3_object.cd3.series.forEach(function (serie) {
 
-                    // Remove old bars/columns
-                    rect.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
-                        .exit().remove();
+                var series = cd3_object.select("g." + serie.type + "." + serie.source);
 
-                    break;
-                case "scatter":
+                switch (serie.type) {
+                    default:
+                    case "line":
 
-                    var circle = series.selectAll("circle");
-
-                    //Update circle positions
-                    circle.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
-                        .transition()
-                        .duration(cd3_object.cd3.animate.duration)
-                        .ease(cd3_object.cd3.animate.ease)
-                        .attr("cx", function (d) {
-                        return cd3_object.cd3.d3xScale(d[cd3_object.cd3.x.source]);
-                    })
-                        .attr("cy", function (d) {
-                        return cd3_object.cd3.d3yScale(d[serie.source]);
-                    });
-
-                    //Add new circles
-                    circle.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
-                        .enter()
-                        .append("circle")
-                        .attr("cx", function (d) {
-                        return cd3_object.cd3.d3xScale(d[cd3_object.cd3.x.source]);
-                    })
-                        .attr("cy", function (d) {
-                        return cd3_object.cd3.d3yScale(d[serie.source]);
-                    })
-                        .attr("r", 2.5);
-
-                    // Remove old circles
-                    circle.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
-                        .exit().remove();
-
-                    break;
-
-            }
-
-        });
-        // redraw the axes..
-
-        cd3_object.cd3.d3graphYAxis.transition()
-            .duration(cd3_object.cd3.animate.duration)
-            .ease(cd3_object.cd3.animate.ease)
-            .call(cd3_object.cd3.d3yAxis);
-
-        cd3_object.cd3.d3graphXAxis.transition()
-            .duration(cd3_object.cd3.animate.duration)
-            .ease(cd3_object.cd3.animate.ease)
-            .call(cd3_object.cd3.d3xAxis);
+                        var line = d3.svg.line()
+                            .x(function (d, i) {
+                            return cd3_object.cd3.d3xScale(d[cd3_object.cd3.x.source]);
+                        })
+                            .y(function (d, i) {
+                            return cd3_object.cd3.d3yScale(d[serie.source]);
+                        });
 
 
-        scope.updateTicks(cd3_object);
+                        //Update path positions
+                        var path = series.selectAll("path")
+                            .data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : [cd3_object.cd3.data])
+                            .transition()
+                            .duration(cd3_object.cd3.animate.duration)
+                            .ease(cd3_object.cd3.animate.ease)
+                            .attr("d", line);
+
+                        break;
+                    case "bar":
+                    case "column":
+
+                        // define dimensions (height for bar, width for column)
+                        var dimension = 0;
+                        // give dimensio value depending on nautre of chart and scale
+                        if (serie.type == "column") {
+                            dimension = cd3_object.cd3.x.scale.type == "ordinal" ? cd3_object.cd3.d3xScale.rangeBand() : cd3_object.cd3.width / data.length;
+                        } else {
+                            dimension = cd3_object.cd3.y.scale.type == "ordinal" ? cd3_object.cd3.d3yScale.rangeBand() : cd3_object.cd3.height / data.length;
+                        }
+                        dimension = dimension < 2 ? 2 : dimension;
+                        var rect = series.selectAll("rect");
+                        //Update bars/columns positions
+                        rect.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
+                            .transition()
+                            .duration(cd3_object.cd3.animate.duration)
+                            .ease(cd3_object.cd3.animate.ease)
+                            .attr("y", function (d, i) {
+                            return serie.type == "column" ? cd3_object.cd3.d3yScale(d[serie.source]) : (i * dimension) + 1;
+                        })
+                            .attr("x", function (d, i) {
+                            return serie.type == "column" ? (i * dimension) + 1 : 0;
+                        })
+                            .attr("height", function (d) {
+                            return serie.type == "column" ? cd3_object.cd3.height - cd3_object.cd3.d3yScale(d[serie.source]) : dimension - 2;
+                        })
+                            .attr("width", function (d) {
+                            return serie.type == "column" ? dimension - 2 : cd3_object.cd3.width - cd3_object.cd3.d3xScale(d[serie.source]);
+                        });
+
+
+                        //Add new bars/columns
+                        rect.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
+                            .enter()
+                            .append("rect")
+                            .attr("y", function (d, i) {
+                            return serie.type == "column" ? cd3_object.cd3.d3yScale(d[serie.source]) : (i * dimension) + 1;
+                        })
+                            .attr("x", function (d, i) {
+                            return serie.type == "column" ? (i * dimension) + 1 : 0;
+                        })
+                            .attr("height", function (d) {
+                            return serie.type == "column" ? cd3_object.cd3.height - cd3_object.cd3.d3yScale(d[serie.source]) : dimension - 2;
+                        })
+                            .attr("width", function (d) {
+                            return serie.type == "column" ? dimension - 2 : cd3_object.cd3.width - cd3_object.cd3.d3xScale(d[serie.source]);
+                        });
+
+                        // Remove old bars/columns
+                        rect.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
+                            .exit().remove();
+
+                        break;
+                    case "scatter":
+
+                        var circle = series.selectAll("circle");
+
+                        //Update circle positions
+                        circle.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
+                            .transition()
+                            .duration(cd3_object.cd3.animate.duration)
+                            .ease(cd3_object.cd3.animate.ease)
+                            .attr("cx", function (d) {
+                            return cd3_object.cd3.d3xScale(d[cd3_object.cd3.x.source]);
+                        })
+                            .attr("cy", function (d) {
+                            return cd3_object.cd3.d3yScale(d[serie.source]);
+                        });
+
+                        //Add new circles
+                        circle.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
+                            .enter()
+                            .append("circle")
+                            .attr("cx", function (d) {
+                            return cd3_object.cd3.d3xScale(d[cd3_object.cd3.x.source]);
+                        })
+                            .attr("cy", function (d) {
+                            return cd3_object.cd3.d3yScale(d[serie.source]);
+                        })
+                            .attr("r", 2.5);
+
+                        // Remove old circles
+                        circle.data(cd3_object.cd3.resampling ? scope.resampleData(cd3_object) : cd3_object.cd3.data)
+                            .exit().remove();
+
+                        break;
+
+                }
+
+            });
+            // redraw the axes..
+
+            cd3_object.cd3.d3graphYAxis.transition()
+                .duration(cd3_object.cd3.animate.duration)
+                .ease(cd3_object.cd3.animate.ease)
+                .call(cd3_object.cd3.d3yAxis);
+
+            cd3_object.cd3.d3graphXAxis.transition()
+                .duration(cd3_object.cd3.animate.duration)
+                .ease(cd3_object.cd3.animate.ease)
+                .call(cd3_object.cd3.d3xAxis);
+
+            scope.updateTicks(cd3_object);
+        }
     },
     resize: function () {
         var scope = cd3;
@@ -462,9 +517,14 @@ var cd3 = {
                 return false;
             }
             scope.updateDimensions(cd3_object);
-            scope.updateRange(cd3_object, "x");
-            scope.updateRange(cd3_object, "y");
-            scope.updateScale(cd3_object);
+            if (cd3_object.cd3.series[0].type == "pie") {
+
+            } else {
+
+                scope.updateRange(cd3_object, "x");
+                scope.updateRange(cd3_object, "y");
+                scope.updateScale(cd3_object);
+            }
             scope.update(cd3_object, cd3_object.cd3.data);
         });
     }

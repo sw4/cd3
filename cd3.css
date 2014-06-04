@@ -43,7 +43,7 @@
     pointer-events: none;
     color:lightgrey;
 }
-.cd3 .series path {
+.cd3 .series path:not(.slice) {
     fill:none;
 }
 .cd3 g.series rect{
