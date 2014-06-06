@@ -14,7 +14,7 @@ Since this version the entire library has been rewritten in order to:
 2. Charts integrate strick reusability principles
 3. Charts are declarative
 4. Charts are extensibile
-5. 5. Adhering to ['Towards Reusable Charts' (Mike Bostock)](http://bost.ocks.org/mike/chart/)
+5. Adhering to ['Towards Reusable Charts' (Mike Bostock)](http://bost.ocks.org/mike/chart/)
 
 Features
 ---
