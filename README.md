@@ -8,7 +8,7 @@ Reusable charting library for d3.js
 
 The master branch is for ongoing development, the most recent 'working version' is branch 0.0.1.
 
-Since this version the entire library has been rewritten in order to:
+Since this version the entire library has been rewritten so that:
 
 1. Code implements best bractice (closure, naming etc)
 2. Charts integrate strick reusability principles
