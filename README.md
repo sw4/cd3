@@ -5,13 +5,13 @@ Reusable charting library for d3.js
 
 Supported Chart Types
 ---
-1. [Line (demo: linear, time)](http://jsfiddle.net/75UEt/44/)
-2. [Column](http://jsfiddle.net/75UEt/35/)
-3. [Bar](http://jsfiddle.net/75UEt/39/)
-4. [Scatter (demo: linear, time)](http://jsfiddle.net/75UEt/40/)
-5. [Scatter (demo: ordinal)](http://jsfiddle.net/75UEt/37/)
-6. [Pie](http://jsfiddle.net/75UEt/36/)
-7. [Mixed (demo: line, scatter - linear, time)](http://jsfiddle.net/75UEt/42/)
+1. [Line (demo: linear, time)](http://jsfiddle.net/75UEt/51/)
+2. [Column](http://jsfiddle.net/75UEt/45/)
+3. [Bar](http://jsfiddle.net/75UEt/46/)
+4. [Scatter (demo: linear, time)](http://jsfiddle.net/75UEt/47/)
+5. [Scatter (demo: ordinal)](http://jsfiddle.net/75UEt/48/)
+6. [Pie](http://jsfiddle.net/75UEt/49/)
+7. [Mixed (demo: line, scatter - linear, time)](http://jsfiddle.net/75UEt/50/)
 
 Features
 ---
