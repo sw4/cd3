@@ -158,6 +158,8 @@ function cd3(config) {
         // automatically define height/width based on parent
         config.width = parseInt(parentEl.style("width"));
         config.height = parseInt(parentEl.style("height"));
+        
+        
         // size anything related to height/width...including ranges
         if (!dimension || dimension == "width") {
             //    svgEl.attr("width", config.width);
@@ -393,15 +395,21 @@ function cd3(config) {
 
     function _drawSeries(series) {
         var serieEl = seriesEl.append("g").attr("class", "series" + series);
+
+        
         // randomly generate the series colors if not already done...
         config.series[series].color = config.series[series].color || _strToColor("series"+series+config.series[series].values);
+
         // lines need the path drawn in advance
         if(config.type==="line"){
+            
             var path = serieEl.append("path")
                 .attr("class", "series" + series + " line " + config.series[series].values + " " + config.series[series].cssClass)
                 .attr("stroke", config.series[series].color);
             _do(path, series, "onAdd");
         }
+
+        
         _redrawSeries(series);
     }
 
@@ -545,11 +553,11 @@ function cd3(config) {
         });
             
     }
-    function _do(obj, series, event){
+    function _do(obj, series, event){        
         if(config.series[series][event]){
             config.series[series][event](obj, event);
         }else{
-            obj.duration(config.animation.duration).ease(config.animation.easing);   
+            obj.duration && obj.duration(config.animation.duration).ease(config.animation.easing);   
         }
     }
     function _seriesValues(series, value) {
@@ -597,7 +605,7 @@ function cd3(config) {
     chart.resize = _resize;
 
     function _draw() {
-        // create the chart elements
+        // create the chart elements);
         svgEl = svgEl || parentEl.append("svg");
         chartEl = chartEl || svgEl.append("g").attr("class", "chart");
         titleEl = titleEl || config.title ? svgEl.append("text").text(config.title).attr("class", "title").attr("y", config.margin.top - (config.margin.top / 2)) : null;
@@ -609,7 +617,6 @@ function cd3(config) {
         
         // format the raw data...do first so domains can be calculated correctly
         _compileData();
-
 
         // sizes all elements...also dont change ranges...as scales not setup
         _resolveSizing(false);
@@ -626,7 +633,7 @@ function cd3(config) {
             // draw initial series....       
             _drawSeries(index);
         });
-
+        
         config.fit && d3.select(window).on('resize', _resize);
 
     }
