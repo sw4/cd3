@@ -43,7 +43,7 @@ function cd3(config) {
             element: {},
             resampling: true,
             fit: true,
-            type:null,
+            type: null,
             margin: {
                 top: 40,
                 right: 40,
@@ -93,18 +93,18 @@ function cd3(config) {
 
         // ensure passed margin is an object
         if (options.margin) options.margin = _resolveMargins(options.margin);
-        
+
         // create chart config using defaults and passed options
         config = _extend(defaults, options);
-        
+
         // convert misfiring objets to arrays
-        config.data=_objToArray(config.data);
-        config.series=_objToArray(config.series);        
-        if(config.xAxis.domain)config.xAxis.domain = _objToArray(config.xAxis.domain);
-        if(config.xAxis.range)config.xAxis.range = _objToArray(config.xAxis.range);
-        if(config.yAxis.domain)config.yAxis.domain = _objToArray(config.yAxis.domain);
-        if(config.yAxis.range)config.yAxis.range = _objToArray(config.yAxis.range);
-        
+        config.data = _objToArray(config.data);
+        config.series = _objToArray(config.series);
+        if (config.xAxis.domain) config.xAxis.domain = _objToArray(config.xAxis.domain);
+        if (config.xAxis.range) config.xAxis.range = _objToArray(config.xAxis.range);
+        if (config.yAxis.domain) config.yAxis.domain = _objToArray(config.yAxis.domain);
+        if (config.yAxis.range) config.yAxis.range = _objToArray(config.yAxis.range);
+
         // (re)build chart as config has changed...
         _draw();
     }
@@ -158,8 +158,8 @@ function cd3(config) {
         // automatically define height/width based on parent
         config.width = parseInt(parentEl.style("width"));
         config.height = parseInt(parentEl.style("height"));
-        
-        
+
+
         // size anything related to height/width...including ranges
         if (!dimension || dimension == "width") {
             //    svgEl.attr("width", config.width);
@@ -178,7 +178,7 @@ function cd3(config) {
 
     function _strToColor(str) {
         var hash = 0;
-        str+=Math.floor(Math.random() * 111111); // add extra randomization
+        str += Math.floor(Math.random() * 111111); // add extra randomization
         for (var i = 0; i < str.length; i++) {
             hash = str.charCodeAt(i) + ((hash << 5) - hash);
         }
@@ -189,8 +189,8 @@ function cd3(config) {
         }
         return color;
     }
-    
-    function _objToArray(obj){
+
+    function _objToArray(obj) {
         var arr = [];
         for (var i in obj) {
             arr.push(obj[i]);
@@ -259,19 +259,21 @@ function cd3(config) {
         if (typeof value === "string") {
             switch (value) {
                 case "time":
-                    scale(d3.time.scale());
+                    scale = d3.time.scale();
                     break;
                 default:
                 case "linear":
-                    scale(d3.scale.linear());
+                    scale = d3.scale.linear();
                     break;
                 case "ordinal":
-                    scale(d3.scale.ordinal());
+                    scale = d3.scale.ordinal();
                     break;
             }
         }
         config[axis + "Axis"].scale = value;
+        axis == "x" ? d3xScale = scale : d3yScale = scale;
         // reapply range and domain
+
         _resolveRange(axis, config[axis + "Axis"].range);
         _resolveDomain(axis, config[axis + "Axis"].domain);
         // update the axis with the updated scale
@@ -316,11 +318,12 @@ function cd3(config) {
     }
 
     function _resolveDomain(axis, value) {
-        var scale = axis == "x" ? d3xScale : d3yScale, domain;
+        var scale = axis == "x" ? d3xScale : d3yScale,
+            domain;
         axis = axis.toLowerCase();
         // domain value being manually changed...so change config...
-        if(value) config[axis + "Axis"].domain = value;
-        value=value || config[axis + "Axis"].domain;
+        if (value) config[axis + "Axis"].domain = value;
+        value = value || config[axis + "Axis"].domain;
 
         // automatically work out domain...based on scale type, set config values
         if (!value && config[axis + "Axis"].scale == "ordinal") {
@@ -362,8 +365,13 @@ function cd3(config) {
         var scale = axis == "x" ? d3xScale : d3yScale;
         axis = axis.toLowerCase();
         if ((!value || value == "auto") && config[axis + "Axis"].scale == "ordinal") {
+
             config[axis + "Axis"].range = axis === "x" ? [0, config.width - config.margin.left - config.margin.right] : [config.height - config.margin.top - config.margin.bottom, 0];
-            scale.rangePoints(config[axis + "Axis"].range);
+            if (config.type == "bar" || config.type == "column") {
+                scale.rangeBands(config[axis + "Axis"].range);
+            } else {
+                scale.rangePoints(config[axis + "Axis"].range);
+            }
         } else if (!value || value == "auto") {
             config[axis + "Axis"].range = axis === "x" ? [0, config.width - config.margin.left - config.margin.right] : [config.height - config.margin.top - config.margin.bottom, 0];
             scale.range(config[axis + "Axis"].range);
@@ -396,170 +404,172 @@ function cd3(config) {
     function _drawSeries(series) {
         var serieEl = seriesEl.append("g").attr("class", "series" + series);
 
-        
+
         // randomly generate the series colors if not already done...
-        config.series[series].color = config.series[series].color || _strToColor("series"+series+config.series[series].values);
+        config.series[series].color = config.series[series].color || _strToColor("series" + series + config.series[series].values);
 
         // lines need the path drawn in advance
-        if(config.type==="line"){
-            
+        if (config.type === "line") {
+
             var path = serieEl.append("path")
                 .attr("class", "series" + series + " line " + config.series[series].values + " " + config.series[series].cssClass)
                 .attr("stroke", config.series[series].color);
             _do(path, series, "onAdd");
         }
 
-        
+
         _redrawSeries(series);
     }
 
-    function _redrawSeries(series) {        
-        var seriesList=[];
-        if(typeof series == "number"){
+    function _redrawSeries(series) {
+        var seriesList = [];
+        if (typeof series == "number") {
             seriesList.push(series);
-        }else{
-            config.series.forEach(function(serie, index){
+        } else {
+            config.series.forEach(function (serie, index) {
                 seriesList.push(index);
             });
         }
-        seriesList.forEach(function(series){
-            switch(config.type){
+        seriesList.forEach(function (series) {
+            switch (config.type) {
                 case "line":
                     var line = d3.svg.line()
                         .x(function (d, i) {
                         return d3xScale(d[config.xAxis.values]);
                     })
-                    .y(function (d, i) {
+                        .y(function (d, i) {
                         return d3yScale(d[config.series[series].values]);
                     });
                     seriesEl.select(".series" + series).select("path")
                         .data([config.data])
                         .transition()
-                        .call(function(obj){
-                            _do(obj, series, "onChange");
-                        })
-                        .attr("d", line);    
-                break;
+                        .call(function (obj) {
+                        _do(obj, series, "onChange");
+                    })
+                        .attr("d", line);
+                    break;
                 case "scatter":
-   
+
                     var circle = seriesEl.select(".series" + series).selectAll("circle");
 
                     //Update circle positions
                     circle.data(config.data)
-                    .transition()
-                    .call(function(obj){
+                        .transition()
+                        .call(function (obj) {
                         _do(obj, series, "onChange");
                     })
-                    .attr("cx", function (d) {
+                        .attr("cx", function (d) {
                         return d3xScale(d[config.xAxis.values]);
                     })
-                    .attr("cy", function (d) {
+                        .attr("cy", function (d) {
                         return d3yScale(d[config.series[series].values]);
                     });
-                    
+
                     //Add new circles
                     circle.data(config.data)
-                    .enter()
-                    .append("circle")
-                    .attr("class", "series" + series + " line " + config.series[series].values + " " + config.series[series].cssClass)
-                    .attr("fill", config.series[series].color)
-                    .attr("stroke", config.series[series].color)
-                    .transition()
-                    .call(function(obj){
+                        .enter()
+                        .append("circle")
+                        .attr("class", "series" + series + " line " + config.series[series].values + " " + config.series[series].cssClass)
+                        .attr("fill", config.series[series].color)
+                        .attr("stroke", config.series[series].color)
+                        .transition()
+                        .call(function (obj) {
                         _do(obj, series, "onAdd");
                     })
-                    .attr("cx", function (d) {
+                        .attr("cx", function (d) {
                         return d3xScale(d[config.xAxis.values]);
                     })
-                    .attr("cy", function (d) {
+                        .attr("cy", function (d) {
                         return d3yScale(d[config.series[series].values]);
                     })
-                    .attr("r", 2.5);                    
-                    
+                        .attr("r", 2.5);
+
                     // Remove old circles
                     circle.data(config.data)
-                    .exit()
-                    .transition()
-                    .call(function(obj){
+                        .exit()
+                        .transition()
+                        .call(function (obj) {
                         _do(obj, series, "onRemove");
                     })
-                    .remove();                    
-                    
-                    
-                break;
+                        .remove();
+
+
+                    break;
 
                 case "bar":
                 case "column":
-                    
+
                     // define dimensions (height for bar, width for column)
                     var dimension = 0;
                     // give dimensio value depending on nautre of chart and scale
                     if (config.type == "column") {
-                        dimension = config.xAxis.type == "ordinal" ? d3xScale.rangeBand() : (config.width-config.margin.left-config.margin.right) / config.data.length;
+                        dimension = config.xAxis.type == "ordinal" ? d3xScale.rangeBand() : (config.width - config.margin.left - config.margin.right) / config.data.length;
                     } else {
-                        dimension = config.yAxis.type == "ordinal" ? d3yScale.rangeBand() : (config.height-config.margin.top-config.margin.bottom) / config.data.length;
+                        dimension = config.yAxis.type == "ordinal" ? d3yScale.rangeBand() : (config.height - config.margin.top - config.margin.bottom) / config.data.length;
                     }
-                    console.log(dimension);
                     dimension = dimension < 2 ? 2 : dimension;
-                    
+
                     var rect = seriesEl.select(".series" + series).selectAll("rect");
                     //Update bars/columns positions
                     rect.data(config.data)
-                    .transition()                    
-                    .call(function(obj){
+                        .transition()
+                        .call(function (obj) {
                         _do(obj, series, "onChange");
                     })
-                    .attr("y", function (d, i) {
+                        .attr("y", function (d, i) {
                         return config.type == "column" ? d3yScale(d[config.series[series].values]) : (i * dimension) + 1;
                     })
-                    .attr("x", function (d, i) {
+                        .attr("x", function (d, i) {
                         return config.type == "column" ? (i * dimension) + 1 : 0;
                     })
-                    .attr("height", function (d) {                        
-                        return config.type == "column" ? config.height-config.margin.top-config.margin.bottom - d3yScale(d[config.series[series].values]) : dimension - 2;
+                        .attr("height", function (d) {
+                        return config.type == "column" ? (config.height - config.margin.top - config.margin.bottom) - d3yScale(d[config.series[series].values]) : dimension - 2;
                     })
-                    .attr("width", function (d) {
-                        return config.type == "column" ? dimension - 2 : config.width-config.margin.left-config.margin.right - d3xScale(d[config.series[series].values]);
+                        .attr("width", function (d) {
+                        return config.type == "column" ? dimension - 2 : d3xScale(d[config.series[series].values]);
                     });
-                    
-                    
+
+
                     //Add new bars/columns
                     rect.data(config.data)
-                    .enter()
-                    .append("rect")
-                    .attr("class", "series" + series + " line " + config.series[series].values + " " + config.series[series].cssClass)
-                    .attr("fill", config.series[series].color)
-                    .attr("y", function (d, i) {
+                        .enter()
+                        .append("rect")
+                        .attr("class", "series" + series + " line " + config.series[series].values + " " + config.series[series].cssClass)
+                        .attr("fill", config.series[series].color)
+                        .attr("y", function (d, i) {
                         return config.type == "column" ? d3yScale(d[config.series[series].values]) : (i * dimension) + 1;
                     })
-                    .attr("x", function (d, i) {
+                        .attr("x", function (d, i) {
                         return config.type == "column" ? (i * dimension) + 1 : 0;
                     })
-                    .attr("height", function (d) {
-                        return config.type == "column" ? config.height-config.margin.top-config.margin.bottom - d3yScale(d[config.series[series].values]) : dimension - 2;
+                        .attr("height", function (d) {
+                        return config.type == "column" ? (config.height - config.margin.top - config.margin.bottom) - d3yScale(d[config.series[series].values]) : dimension - 2;
                     })
-                    .attr("width", function (d) {
-                        return config.type == "column" ? dimension - 2 : config.width-config.margin.left-config.margin.right - d3xScale(d[config.series[series].values]);
+                        .attr("width", function (d) {
+
+                        return config.type == "column" ? dimension - 2 : d3xScale(d[config.series[series].values]);
                     });
-                    
+
                     // Remove old bars/columns
                     rect.data(config.data)
-                    .exit().remove();
+                        .exit().remove();
 
-                    
-                    
-                break;                    
+
+
+                    break;
             }
         });
-            
+
     }
-    function _do(obj, series, event){        
-        if(config.series[series][event]){
+
+    function _do(obj, series, event) {
+        if (config.series[series][event]) {
             config.series[series][event](obj, event);
-        }else{
-            obj.duration && obj.duration(config.animation.duration).ease(config.animation.easing);   
+        } else {
+            obj.duration && obj.duration(config.animation.duration).ease(config.animation.easing);
         }
     }
+
     function _seriesValues(series, value) {
         var isSeries = typeof series == "number" ? true : false;
         if (isSeries && !value) return config.series[series].values;
@@ -614,7 +624,7 @@ function cd3(config) {
         axesEl = axesEl || chartEl.append("g").attr("class", "axes");
         xAxisEl = xAxisEl || axesEl.append("g").attr("class", "x axis");
         yAxisEl = yAxisEl || axesEl.append("g").attr("class", "y axis");
-        
+
         // format the raw data...do first so domains can be calculated correctly
         _compileData();
 
@@ -633,7 +643,7 @@ function cd3(config) {
             // draw initial series....       
             _drawSeries(index);
         });
-        
+
         config.fit && d3.select(window).on('resize', _resize);
 
     }
