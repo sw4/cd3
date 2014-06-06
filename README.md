@@ -13,8 +13,8 @@ Since this version the entire library has been rewritten so that:
 1. Code implements best bractice (closure, naming etc)
 2. Charts integrate strick reusability principles
 3. Charts are declarative
-4. Charts are extensibile
-5. Charts adhere to ['Towards Reusable Charts' (Mike Bostock)](http://bost.ocks.org/mike/chart/)
+4. Charts are repeatable, modifiable, configurable and extensibile
+5. Charts adhere to ['Towards Reusable Charts' (Mike Bostock)](http://bost.ocks.org/mike/chart/) and ['Exploring Reusability with D3.js' (Mike Pennisi)](http://bocoup.com/weblog/reusability-with-d3/)
 
 Features
 ---
