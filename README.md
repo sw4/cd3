@@ -1,4 +1,4 @@
-cd3
+cd3 v0.0.1
 ===
 
 Reusable charting library for d3.js
