@@ -707,8 +707,6 @@ function cd3(config) {
             _drawSeries(index);
         });
 
-        config.autoResize && d3.select(window).on('resize', _resize);
-
     }
     return chart;
 };
