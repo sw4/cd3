@@ -5,7 +5,7 @@ Reusable charting library for d3.js
 
 ###[Example Charts](http://jsfiddle.net/C2m5V/)###
 
-Key Tdevelopment tenets:
+Key development tenets:
 
 1. Code implements best bractice (closure, naming etc)
 2. Charts integrate strick reusability principles
