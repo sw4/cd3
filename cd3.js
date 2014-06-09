@@ -42,7 +42,6 @@ function cd3(config) {
         var defaults = {
             element: {},
             resampling: true,
-            fit: true,
             type: null,
             margin: {
                 top: 40,
@@ -708,7 +707,7 @@ function cd3(config) {
             _drawSeries(index);
         });
 
-        config.fit && d3.select(window).on('resize', _resize);
+        config.autoResize && d3.select(window).on('resize', _resize);
 
     }
     return chart;
