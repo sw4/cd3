@@ -16,10 +16,6 @@
     right:10px;
     top:10px;
 }
-.cd3 .legend span {
-    display:inline-block;
-    margin-left:10px;
-}
 .cd3 .series path:not(.pie) {
     fill:none;
 }

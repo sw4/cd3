@@ -63,10 +63,10 @@ function cd3(config) {
             scale: "linear",
             format: null,
             values: null,
-            ticks: {
-                xOffset: 0,
-                yOffset: 0,
-                rotate: 0
+            ticks:{
+                rotate:0,
+                x:null,
+                y:null
             }
         }
 
@@ -75,10 +75,10 @@ function cd3(config) {
             scale: "linear",
             format: null,
             values: null,
-            ticks: {
-                xOffset: 0,
-                yOffset: 0,
-                rotate: 0
+            ticks:{
+                rotate:0,
+                x:null,
+                y:null
             }
         }
 
@@ -239,15 +239,38 @@ function cd3(config) {
         return d3yAxis;
     }
 
+    
+    function _resolveTicks(axis){
+        if (axis) axis = axis.toLowerCase();   
+        ticks = axis == "x" ? xAxisEl.selectAll(".tick text") : yAxisEl.selectAll(".tick text");
+        if(config[axis+"Axis"].ticks.rotate > 0){
+            ticks.attr("transform", function (d) {
+                return "rotate(" + config[axis+"Axis"].ticks.rotate + ")"
+            });
+        }
+        if(config[axis+"Axis"].ticks.x){            
+            ticks.attr("x", config[axis+"Axis"].ticks.x);
+        }
+        if(config[axis+"Axis"].ticks.y){            
+            ticks.attr("y", config[axis+"Axis"].ticks.y);
+        } 
+        if (axis == "x") {
+            d3xAxis.ticks(Math.max(config.width / 130, 2)); 
+        }
+        if (axis == "y") {
+            d3yAxis.ticks(Math.max(config.height / 20, 2)); 
+        }
+    }
     function _drawAxis(axis) {
 
-        if (axis) axis = axis.toLowerCase();
-
+        if (axis) axis = axis.toLowerCase();        
         if (!axis || axis == "x") {
             xAxisEl.call(d3xAxis);
+            _resolveTicks("x");
         }
         if (!axis || axis == "y") {
             yAxisEl.call(d3yAxis);
+            _resolveTicks("y");
         }
     }
 
@@ -466,7 +489,13 @@ function cd3(config) {
             _do(path, series, "onAdd");
         }
 
-
+        if(legendEl){
+            legendEl
+            .append("div")
+            .attr("class", "series" + series + " "+config.type+" " + config.series[series].values + " " + config.series[series].cssClass)
+             .style("color", config.series[series].color)
+            .html(series.title || "series"+series)
+        }
         _redrawSeries(series);
     }
 
@@ -582,13 +611,13 @@ function cd3(config) {
                     //Add new bars/columns
                     rect.data(config.data)
                         .enter()
-                        .append("rect").transition()
+                        .append("rect")
+                        .attr("class", "series" + series + " line " + config.series[series].values + " " + config.series[series].cssClass)
+                        .attr("fill", config.series[series].color)
                         .transition()
                         .call(function (obj) {
                         _do(obj, series, "onAdd");
                     })
-                        .attr("class", "series" + series + " line " + config.series[series].values + " " + config.series[series].cssClass)
-                        .attr("fill", config.series[series].color)
                         .attr("y", function (d, i) {
                         return config.type == "column" ? d3yScale(d[config.series[series].values]) : (i * dimension) + 1;
                     })
@@ -747,4 +776,4 @@ function cd3(config) {
     }
     return chart;
 };
-        
+     
