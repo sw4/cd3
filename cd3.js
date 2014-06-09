@@ -1,7 +1,7 @@
 function cd3(config) {
 
     var chart = {},
-    parentEl = null,
+        parentEl = null,
         svgEl = null,
         chartEl = null,
         seriesEl = null,
@@ -42,6 +42,7 @@ function cd3(config) {
         var defaults = {
             element: {},
             resampling: true,
+            fit: true,
             type: null,
             margin: {
                 top: 40,
@@ -53,7 +54,6 @@ function cd3(config) {
                 easing: "linear",
                 duration: 200
             },
-            autoResize: true,
             title: false,
             legend: true
         };
@@ -140,7 +140,7 @@ function cd3(config) {
         }
         return value;
     }
-    // margin getter/setter
+    // width getter/setter
     function _margin(value) {
         if (!arguments.length) return config.margin;
         config.margin = _resolveMargins(value);
@@ -398,17 +398,18 @@ function cd3(config) {
         return config.yAxis.range;
     }
 
-    function _resolveFormat(axis, value){        
-        axis = axis.toLowerCase();      
-        value = value || config[axis+"Axis"].format;
-        config[axis+"Axis"].format=value;
-        if(axis == "x"){
+    function _resolveFormat(axis, value) {
+        axis = axis.toLowerCase();
+        value = value || config[axis + "Axis"].format;
+        config[axis + "Axis"].format = value;
+        if (axis == "x") {
             d3xAxis.tickFormat(value);
-        }else{
+        } else {
             d3yAxis.tickFormat(value);
-        } 
+        }
         _drawAxis(axis);
     }
+
     function _xFormat(value) {
         if (arguments.length) {
             _resolveFormat("x", value);
@@ -425,23 +426,25 @@ function cd3(config) {
         return config.yAxis.format;
     }
 
-        
+
 
     function _onAdd(series, value) {
         if (arguments.length && typeof value == "function") {
-            config.series[series].onAdd=value;
+            config.series[series].onAdd = value;
         }
         return chart;
     }
+
     function _onChange(series, value) {
         if (arguments.length && typeof value == "function") {
-            config.series[series].onChange=value;
+            config.series[series].onChange = value;
         }
         return chart;
     }
+
     function _onRemove(series, value) {
         if (arguments.length && typeof series == "number" && typeof value == "function") {
-            config.series[series].onRemove=value;
+            config.series[series].onRemove = value;
         }
         return chart;
     }
@@ -580,7 +583,7 @@ function cd3(config) {
                     rect.data(config.data)
                         .enter()
                         .append("rect").transition()
-                    .transition()
+                        .transition()
                         .call(function (obj) {
                         _do(obj, series, "onAdd");
                     })
@@ -603,11 +606,11 @@ function cd3(config) {
                     // Remove old bars/columns
                     rect.data(config.data)
                         .exit()
-                    .transition()
+                        .transition()
                         .call(function (obj) {
                         _do(obj, series, "onRemove");
                     })
-                    .remove();
+                        .remove();
 
 
 
@@ -644,6 +647,39 @@ function cd3(config) {
         return chart;
     }
 
+    function _showSeries(value) {
+        if (arguments.length && typeof value == "number" && config.series[value]) {
+            _drawSeries(value);
+        }
+        return chart;
+    }
+
+    function _hideSeries(value) {
+        if (arguments.length && typeof value == "number" && config.series[value]) {
+            var obj = null;
+            switch (config.type) {
+                case "line":
+                    var obj = seriesEl.select(".series" + value).selectAll("path");
+                    break;
+                case "scatter":
+                    var obj = seriesEl.select(".series" + value).selectAll("circle");
+                    break;
+                case "bar":
+                case "column":
+                    var obj = seriesEl.select(".series" + value).selectAll("rect");
+                    break;
+            }
+
+            obj.transition()
+                .call(function (obj) {
+                _do(obj, series, "onRemove");
+            })
+                .remove();
+        }
+
+        return chart;
+    }
+
     function _resize() {
         _resolveSizing("auto");
         _drawAxis("x");
@@ -667,13 +703,14 @@ function cd3(config) {
     chart.yRange = _yRange;
     chart.seriesValues = _seriesValues;
     chart.addSeries = _addSeries;
-    chart.removeSeries = _removeSeries;    
+    chart.hideSeries = _hideSeries;
+    chart.showSeries = _showSeries;
     chart.resize = _resize;
     chart.onAdd = _onAdd;
     chart.onChange = _onAdd;
-    chart.onAdd = _onAdd;    
+    chart.onAdd = _onAdd;
     chart.xFormat = _xFormat;
-    chart.yFormat = _yFormat;        
+    chart.yFormat = _yFormat;
 
     function _draw() {
         // create the chart elements);
