@@ -140,7 +140,7 @@ function cd3(config) {
         }
         return value;
     }
-    // width getter/setter
+    // margin getter/setter
     function _margin(value) {
         if (!arguments.length) return config.margin;
         config.margin = _resolveMargins(value);
@@ -151,7 +151,6 @@ function cd3(config) {
         return chart;
     };
     // dimension adjustment (any change to width or height)
-
     function _resolveSizing(range, dimension) {
 
         // automatically define height/width based on parent
