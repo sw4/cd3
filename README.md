@@ -19,6 +19,7 @@ d3.js (tested for 3.0.4), cd3 javscript and CSS.
 
 Configuration
 ---
+```javascript
 var chart = cd3({
     element:"#chart", // either id or DOM element to place chart within
     type:"line" // chart type, line, bar, column or scatter
@@ -49,7 +50,7 @@ var chart = cd3({
         cssClass:"seriesClass", // string, name of a css class to apply to series
     }]
 });
-
+```
 Methods
 ---
 
