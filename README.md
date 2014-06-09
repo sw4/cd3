@@ -3,9 +3,9 @@ cd3
 
 Reusable charting library for d3.js
 
-[See example charts here from version 0.0.1](https://github.com/sw4/cd3/blob/0.0.1/README.md)
+###[Example Charts](http://jsfiddle.net/C2m5V/)###
 
-Since this version the entire library has been rewritten so that:
+Key Tdevelopment tenets:
 
 1. Code implements best bractice (closure, naming etc)
 2. Charts integrate strick reusability principles
