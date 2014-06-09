@@ -48,6 +48,9 @@ var chart = cd3({
         title:"series 1", // series title
         color:"red", // series color, can be any web recognized color format
         cssClass:"seriesClass", // string, name of a css class to apply to series
+        onAdd:function(obj), // function to apply when data added to series, obj represents the related d3 chart item
+        onChange:function(obj), // function to apply when data changes, obj represents the related d3 chart item
+        onRemove:function(obj) // function to apply when data removed from series, obj represents the related d3 chart item
     }]
 });
 ```
