@@ -399,6 +399,53 @@ function cd3(config) {
         return config.yAxis.range;
     }
 
+    function _resolveFormat(axis, value){        
+        axis = axis.toLowerCase();      
+        value = value || config[axis+"Axis"].format;
+        config[axis+"Axis"].format=value;
+        if(axis == "x"){
+            d3xAxis.tickFormat(value);
+        }else{
+            d3yAxis.tickFormat(value);
+        } 
+        _drawAxis(axis);
+    }
+    function _xFormat(value) {
+        if (arguments.length) {
+            _resolveFormat("x", value);
+            return chart;
+        }
+        return config.xAxis.format;
+    }
+
+    function _yFormat(value) {
+        if (arguments.length) {
+            _resolveFormat("y", value);
+            return chart;
+        }
+        return config.yAxis.format;
+    }
+
+        
+
+    function _onAdd(series, value) {
+        if (arguments.length && typeof value == "function") {
+            config.series[series].onAdd=value;
+        }
+        return chart;
+    }
+    function _onChange(series, value) {
+        if (arguments.length && typeof value == "function") {
+            config.series[series].onChange=value;
+        }
+        return chart;
+    }
+    function _onRemove(series, value) {
+        if (arguments.length && typeof series == "number" && typeof value == "function") {
+            config.series[series].onRemove=value;
+        }
+        return chart;
+    }
 
 
     function _drawSeries(series) {
@@ -533,7 +580,11 @@ function cd3(config) {
                     //Add new bars/columns
                     rect.data(config.data)
                         .enter()
-                        .append("rect")
+                        .append("rect").transition()
+                    .transition()
+                        .call(function (obj) {
+                        _do(obj, series, "onAdd");
+                    })
                         .attr("class", "series" + series + " line " + config.series[series].values + " " + config.series[series].cssClass)
                         .attr("fill", config.series[series].color)
                         .attr("y", function (d, i) {
@@ -552,7 +603,12 @@ function cd3(config) {
 
                     // Remove old bars/columns
                     rect.data(config.data)
-                        .exit().remove();
+                        .exit()
+                    .transition()
+                        .call(function (obj) {
+                        _do(obj, series, "onRemove");
+                    })
+                    .remove();
 
 
 
@@ -612,7 +668,13 @@ function cd3(config) {
     chart.yRange = _yRange;
     chart.seriesValues = _seriesValues;
     chart.addSeries = _addSeries;
+    chart.removeSeries = _removeSeries;    
     chart.resize = _resize;
+    chart.onAdd = _onAdd;
+    chart.onChange = _onAdd;
+    chart.onAdd = _onAdd;    
+    chart.xFormat = _xFormat;
+    chart.yFormat = _yFormat;        
 
     function _draw() {
         // create the chart elements);
@@ -635,6 +697,8 @@ function cd3(config) {
         d3xAxis.orient("bottom");
         d3yAxis.orient("left");
 
+        _resolveFormat("x");
+        _resolveFormat("y");
         // create scale, automatically propogates domain and ranges..do before sizing so scales exist.
         _resolveScale("x");
         _resolveScale("y");
@@ -650,3 +714,127 @@ function cd3(config) {
     return chart;
 
 };
+
+var data = [{
+    "time": 1401446958259,
+        "value1": 4,
+        "value2": 4,
+        "value3": 0
+}, {
+    "time": 1401446958560,
+        "value1": 6,
+        "value2": 10,
+        "value3": 0
+}, {
+    "time": 1401446958860,
+        "value1": 8,
+        "value2": 13,
+        "value3": 1
+}, {
+    "time": 1401446959160,
+        "value1": 3,
+        "value2": 18,
+        "value3": 1
+}, {
+    "time": 1401446959460,
+        "value1": 9,
+        "value2": 10,
+        "value3": 1
+}, {
+    "time": 1401446959761,
+        "value1": 0,
+        "value2": 7,
+        "value3": 0
+}, {
+    "time": 1401446960061,
+        "value1": 7,
+        "value2": 17,
+        "value3": 1
+}, {
+    "time": 1401446960361,
+        "value1": 3,
+        "value2": 10,
+        "value3": 0
+}, {
+    "time": 1401446960662,
+        "value1": 0,
+        "value2": 16,
+        "value3": 0
+}, {
+    "time": 1401446960962,
+        "value1": 9,
+        "value2": 9,
+        "value3": 0
+}, {
+    "time": 1401446961262,
+        "value1": 5,
+        "value2": 4,
+        "value3": 0
+}, {
+    "time": 1401446961562,
+        "value1": 3,
+        "value2": 10,
+        "value3": 0
+}, {
+    "time": 1401446961862,
+        "value1": 0,
+        "value2": 17,
+        "value3": 1
+}, {
+    "time": 1401446962162,
+        "value1": 8,
+        "value2": 8,
+        "value3": 1
+}, {
+    "time": 1401446962462,
+        "value1": 2,
+        "value2": 19,
+        "value3": 1
+}, {
+    "time": 1401446962762,
+        "value1": 0,
+        "value2": 0,
+        "value3": 1
+}];
+
+
+var test = cd3({
+    element: '#chart',
+    type: "column",
+    title: "chart",
+    data: data,
+    xAxis: {
+        scale: "ordinal",
+        values: "time"
+    },
+    yAxis: {
+        values: "value1"
+    },
+    series: [{
+        values: "value1"
+    }]
+});
+
+test.xFormat();
+changeData = function (action) {
+    var oldData = test.data();
+    if (action === "add" || action === "shift") {
+        oldData.push({
+            time: oldData[oldData.length - 1].time + 500,
+            value1: Math.floor(Math.random() * 10),
+            value2: Math.floor(Math.random() * 20),
+            value3: Math.floor(Math.random() * 2)
+        });
+    }
+    if ((action === "remove" && oldData.length > 1) || action === "shift") {
+        oldData.shift();
+    }
+    if (action === "change") {
+        oldData.forEach(function (item) {
+            item.value1 = Math.floor(Math.random() * 10);
+            item.value2 = Math.floor(Math.random() * 20);
+            item.value3 = Math.floor(Math.random() * 2);
+        });
+    }
+    test.data(oldData);
+}
