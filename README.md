@@ -25,7 +25,6 @@ var chart = cd3({
     type:"line" // chart type, line, bar, column or scatter
     title: "chart", // string to use for chart title
     data: data, // JSON data
-    autoResize: true, // resize chart on window/container resize
     margin: 10, // either an integer to be uniformly applied to all chart margins, or an object consisting of top, right, bottom, left values
     legend: true, // add a legend to the chart,
     animation: {
