@@ -217,7 +217,7 @@ function cd3(config) {
     // data getter/setter
     function _data(value) {
         if (!arguments.length) return config.data;
-        config.data = _compileData(data);
+        config.data = _compileData();
         // data has changed so resolve domains
         _resolveDomain("x");
         _resolveDomain("y");
