@@ -14,6 +14,7 @@ Key development tenets:
 4. Charts are repeatable, modifiable, configurable and extensibile
 
 Further information:
+
 1. ['Towards Reusable Charts' (Mike Bostock)](http://bost.ocks.org/mike/chart/) 
 2. ['Exploring Reusability with D3.js' (Mike Pennisi)](http://bocoup.com/weblog/reusability-with-d3/)
 
