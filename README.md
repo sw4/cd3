@@ -4,7 +4,7 @@ cd3
 Reusable charting library for d3.js
 
 ###[Example Line/Bar/Column/Scatter Charts](http://jsfiddle.net/sCE8A/)###
-###[Example Pie Chart](http://jsfiddle.net/jpw95/)###
+###[Example Pie/Donut Charts](http://jsfiddle.net/jpw95/)###
 
 Key development tenets:
 
@@ -55,6 +55,7 @@ var chart = cd3({
     series: [{ // array of objects representing series to plot
         values: "values", // source of series values     
         categories: "categories", // pie charts only; source of series categories     
+        donut: 0, // pie charts only; optional, percentage size of donut hole    
         color:"red", // series color, can be any web recognized color format
         title:"series 1", // series title
         color:"red", // series color, can be any web recognized color format
