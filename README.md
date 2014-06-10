@@ -23,7 +23,7 @@ Configuration
 ```javascript
 var chart = cd3({
     element:"#chart", // either id or DOM element to place chart within
-    type:"line" // chart type, line, bar, column or scatter
+    type:"line" // chart type; pie, line, bar, column or scatter
     title: "chart", // string to use for chart title
     data: data, // JSON data
     margin: 10, // either an integer to be uniformly applied to all chart margins, or an object consisting of top, right, bottom, left values
@@ -32,7 +32,7 @@ var chart = cd3({
                 easing: "linear", // default chart animation easing
                 duration: 200 // default chart animation duration
     },
-    xAxis: {
+    xAxis: { // not required for pie charts
         scale: "ordinal", // scale type, e.g. ordinal, linear, time
         values: "time" // source of axis values
         range:[0,100], // axis range
@@ -44,11 +44,12 @@ var chart = cd3({
             y:0 // y offset
         }
     },
-    yAxis: {
+    yAxis: { // not required for pie charts
         // same configuration as for x Axis
     },
     series: [{ // array of objects representing series to plot
-        values: "values", // source of series values        
+        values: "values", // source of series values     
+        categories: "categories", // pie charts only; source of series categories     
         color:"red", // series color, can be any web recognized color format
         title:"series 1", // series title
         color:"red", // series color, can be any web recognized color format
