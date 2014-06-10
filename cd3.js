@@ -494,7 +494,7 @@ function cd3(config) {
             pieData.forEach(function (r) {                
                 legendEl.select("div .series"+series).append("div")                
                 .attr("class", "pie category_" + r[config.series[series].categories] + " value_" + r[config.series[series].values] + " "+ config.series[series].cssClass)              
-                .style("color", _strToColor("category_" + r[config.series[series].categories]))
+                .style("color", _strToColor("category_" + r[config.series[series].categories]+"value_" + r[config.series[series].values]))
                 .html(r[config.series[series].categories] + ": " + r[config.series[series].values]);
             });
         }
@@ -553,7 +553,7 @@ function cd3(config) {
                     path.data(pie(pieData))
 
                         .attr("fill", function (d, i) {
-                        return _strToColor("category_" + d.data[config.series[series].categories]);
+                        return _strToColor("category_" + d.data[config.series[series].categories]+"value_" + d.data[config.series[series].values]);
                     })                    
                         .transition()
                         .call(function (obj) {
@@ -569,7 +569,7 @@ function cd3(config) {
                         return "pie category_" + d.data[config.series[series].categories] + " value_" + d.data[config.series[series].values] + " "+ config.series[series].cssClass
                     })
                         .attr("fill", function (d, i) {
-                        return _strToColor("category_" + d.data[config.series[series].categories]);
+                        return _strToColor("category_" + d.data[config.series[series].categories]+"value_" + d.data[config.series[series].values]);
                     })
                         .transition()
                         .call(function (obj) {
