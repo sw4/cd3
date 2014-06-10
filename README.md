@@ -8,11 +8,14 @@ Reusable charting library for d3.js
 
 Key development tenets:
 
-1. Code implements best bractice (closure, naming etc)
-2. Charts integrate strick reusability principles
+1. Charts provide basic building blocks
+2. Charts integrate strict reusability principles
 3. Charts are declarative
 4. Charts are repeatable, modifiable, configurable and extensibile
-5. Charts adhere to ['Towards Reusable Charts' (Mike Bostock)](http://bost.ocks.org/mike/chart/) and ['Exploring Reusability with D3.js' (Mike Pennisi)](http://bocoup.com/weblog/reusability-with-d3/)
+
+Further information:
+1. ['Towards Reusable Charts' (Mike Bostock)](http://bost.ocks.org/mike/chart/) 
+2. ['Exploring Reusability with D3.js' (Mike Pennisi)](http://bocoup.com/weblog/reusability-with-d3/)
 
 Requirements
 ---
