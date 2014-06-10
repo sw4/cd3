@@ -663,6 +663,7 @@ function cd3(config) {
                     } else {
                         dimension = config.yAxis.type == "ordinal" ? d3yScale.rangeBand() : (config.height - config.margin.top - config.margin.bottom) / config.data.length;
                     }
+                    dimension=dimension/config.series.length;
                     dimension = dimension < 2 ? 2 : dimension;
 
                     var rect = seriesEl.select(".series" + series).selectAll("rect");
@@ -673,10 +674,10 @@ function cd3(config) {
                         _do(obj, series, "onChange");
                     })
                         .attr("y", function (d, i) {
-                        return config.type == "column" ? d3yScale(d[config.series[series].values]) : (i * dimension) + 1;
+                        return config.type == "column" ? d3yScale(d[config.series[series].values]) : (i*(dimension*config.series.length)+dimension*series) + 1;
                     })
                         .attr("x", function (d, i) {
-                        return config.type == "column" ? (i * dimension) + 1 : 0;
+                        return config.type == "column" ? (i*(dimension*config.series.length)+dimension*series) + 1 : 0;
                     })
                         .attr("height", function (d) {
                         return config.type == "column" ? (config.height - config.margin.top - config.margin.bottom) - d3yScale(d[config.series[series].values]) : dimension - 2;
@@ -697,10 +698,11 @@ function cd3(config) {
                         _do(obj, series, "onAdd");
                     })
                         .attr("y", function (d, i) {
-                        return config.type == "column" ? d3yScale(d[config.series[series].values]) : (i * dimension) + 1;
+                        return config.type == "column" ? d3yScale(d[config.series[series].values]) : (i*(dimension*config.series.length)+dimension*series) + 1;
                     })
                         .attr("x", function (d, i) {
-                        return config.type == "column" ? (i * dimension) + 1 : 0;
+
+                        return config.type == "column" ? (i*(dimension*config.series.length)+dimension*series) + 1 : 0;
                     })
                         .attr("height", function (d) {
                         return config.type == "column" ? (config.height - config.margin.top - config.margin.bottom) - d3yScale(d[config.series[series].values]) : dimension - 2;
