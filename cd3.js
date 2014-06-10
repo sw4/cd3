@@ -180,7 +180,7 @@ function cd3(config) {
 
     function _strToColor(str) {
         var hash = 0;
-        str += Math.floor(Math.random() * 111111); // add extra randomization
+        // str += Math.floor(Math.random() * 111111); // add extra randomization
         for (var i = 0; i < str.length; i++) {
             hash = str.charCodeAt(i) + ((hash << 5) - hash);
         }
@@ -199,6 +199,7 @@ function cd3(config) {
         }
         return arr;
     }
+    
     // sort data
     function _sort(data, key, dir) {
         dir = dir || "asc";
@@ -382,6 +383,7 @@ function cd3(config) {
         return config.xAxis.domain;
     }
 
+
     function _yDomain(value) {
         if (arguments.length) {
             _resolveDomain("y", value);
@@ -483,9 +485,13 @@ function cd3(config) {
 
     function _resolveLegend(series){
         if (config.type === "pie") {
-            config.data=_sort(config.data, config.series[series].values, "desc");
+            // data needs to be filtered to exclude zero and negative amounts
+            var pieData = config.data.filter(function(r){
+                return r[config.series[series].values] >0;           
+            });         
+            pieData=_sort(pieData, config.series[series].values, "desc");
             legendEl.select("div .series"+series).selectAll("div").remove();            
-            config.data.forEach(function (r) {                
+            pieData.forEach(function (r) {                
                 legendEl.select("div .series"+series).append("div")
                 .attr("class", "series" + series + " category " + config.type + " " + config.series[series].values + " " + config.series[series].cssClass)
                 .style("color", _strToColor("category" + r[config.series[series].categories]))
@@ -530,7 +536,10 @@ function cd3(config) {
             switch (config.type) {
 
                 case "pie":
-
+                    // data needs to be filtered to exclude zero and negative amounts
+                    var pieData = config.data.filter(function(r){
+                        return r[config.series[series].values] >0;           
+                    });    
                     var radius = Math.min(config.width - config.margin.left - config.margin.right, config.height - config.margin.top - config.margin.bottom) / 2;
                     seriesEl.select(".series" + series)
                         .attr("transform", "translate(" + (config.width - config.margin.left - config.margin.right) / 2 + "," + (config.height - config.margin.top - config.margin.bottom) / 2 + ")");
@@ -541,7 +550,7 @@ function cd3(config) {
                     var path = seriesEl.select(".series" + series).selectAll("path");
 
                     //Update slice positions
-                    path.data(pie(config.data))
+                    path.data(pie(pieData))
                         .transition()
                         .call(function (obj) {
                         _do(obj, series, "onChange");
@@ -549,7 +558,7 @@ function cd3(config) {
                         .attr("d", arc);
 
                     //Add new slices
-                    path.data(pie(config.data))
+                    path.data(pie(pieData))
                         .enter()
                         .append("path")
                         .attr("class", "series" + series + " pie " + config.series[series].values + " " + config.series[series].cssClass)
@@ -563,7 +572,7 @@ function cd3(config) {
                         .attr("d", arc);
 
                     // Remove old slices            
-                    path.data(pie(config.data))
+                    path.data(pie(pieData))
                         .exit()
                         .transition()
                         .call(function (obj) {
@@ -844,4 +853,3 @@ function cd3(config) {
     }
     return chart;
 };
-
