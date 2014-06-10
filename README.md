@@ -36,7 +36,12 @@ var chart = cd3({
         values: "time" // source of axis values
         range:[0,100], // axis range
         domain:[0,100], // axis domain
-        format:function(d){} // function to format tick values
+        format:function(d){}, // function to format axis values
+        ticks:{ // optional 
+            rotate:0, // tick label rotation
+            x:0, // x offset
+            y:0 // y offset
+        }
     },
     yAxis: {
         // same configuration as for x Axis
