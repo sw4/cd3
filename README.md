@@ -12,6 +12,7 @@ Key development tenets:
 2. Charts integrate strict reusability principles
 3. Charts are declarative
 4. Charts are repeatable, modifiable, configurable and extensibile
+5. Seperation of concerns (CSS for styling, JS for functionality, HTML for content)
 
 Further information:
 
