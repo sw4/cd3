@@ -512,7 +512,9 @@ function cd3(config) {
                 .attr("class", "series" + series + " line " + config.series[series].values + " " + config.series[series].cssClass)
                 .attr("stroke", config.series[series].color);
             _do(path, series, "onAdd");
-        }
+        } else if (config.type === "pie") {
+            config.series[series].donut = config.series[series].donut || 0;      
+        }   
 
         if (legendEl) {
             legendEl.append("div")
@@ -540,10 +542,12 @@ function cd3(config) {
                     var pieData = config.data.filter(function(r){
                         return r[config.series[series].values] >0;           
                     });    
+                    
                     var radius = Math.min(config.width - config.margin.left - config.margin.right, config.height - config.margin.top - config.margin.bottom) / 2;
                     seriesEl.select(".series" + series)
                         .attr("transform", "translate(" + (config.width - config.margin.left - config.margin.right) / 2 + "," + (config.height - config.margin.top - config.margin.bottom) / 2 + ")");
-                    var arc = d3.svg.arc().outerRadius(radius);
+                    var arc = d3.svg.arc().outerRadius(radius)
+    .innerRadius(radius*(config.series[series].donut/100));
                     var pie = d3.layout.pie().value(function (d) {
                         return d[config.series[series].values];
                     });
