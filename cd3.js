@@ -655,6 +655,7 @@ function cd3(config) {
                 case "bar":
                 case "column":
 
+
                     // define dimensions (height for bar, width for column)
                     var dimension = 0;
                     // give dimensio value depending on nautre of chart and scale
@@ -666,6 +667,10 @@ function cd3(config) {
                     dimension=dimension/config.series.length;
                     dimension = dimension < 2 ? 2 : dimension;
 
+                    function seriesOffset(i){
+                        return (i*(dimension*config.series.length)+dimension*series) 
+                    }
+                    
                     var rect = seriesEl.select(".series" + series).selectAll("rect");
                     //Update bars/columns positions
                     rect.data(config.data)
@@ -674,10 +679,10 @@ function cd3(config) {
                         _do(obj, series, "onChange");
                     })
                         .attr("y", function (d, i) {
-                        return config.type == "column" ? d3yScale(d[config.series[series].values]) : (i*(dimension*config.series.length)+dimension*series) + 1;
+                        return config.type == "column" ? d3yScale(d[config.series[series].values]) : seriesOffset(i) + 1;
                     })
                         .attr("x", function (d, i) {
-                        return config.type == "column" ? (i*(dimension*config.series.length)+dimension*series) + 1 : 0;
+                        return config.type == "column" ? seriesOffset(i) + 1 : 0;
                     })
                         .attr("height", function (d) {
                         return config.type == "column" ? (config.height - config.margin.top - config.margin.bottom) - d3yScale(d[config.series[series].values]) : dimension - 2;
@@ -698,11 +703,11 @@ function cd3(config) {
                         _do(obj, series, "onAdd");
                     })
                         .attr("y", function (d, i) {
-                        return config.type == "column" ? d3yScale(d[config.series[series].values]) : (i*(dimension*config.series.length)+dimension*series) + 1;
+                        return config.type == "column" ? d3yScale(d[config.series[series].values]) : seriesOffset(i) + 1;
                     })
                         .attr("x", function (d, i) {
 
-                        return config.type == "column" ? (i*(dimension*config.series.length)+dimension*series) + 1 : 0;
+                        return config.type == "column" ? seriesOffset(i) + 1 : 0;
                     })
                         .attr("height", function (d) {
                         return config.type == "column" ? (config.height - config.margin.top - config.margin.bottom) - d3yScale(d[config.series[series].values]) : dimension - 2;
