@@ -492,9 +492,9 @@ function cd3(config) {
             pieData=_sort(pieData, config.series[series].values, "desc");
             legendEl.select("div .series"+series).selectAll("div").remove();            
             pieData.forEach(function (r) {                
-                legendEl.select("div .series"+series).append("div")
-                .attr("class", "series" + series + " category " + config.type + " " + config.series[series].values + " " + config.series[series].cssClass)
-                .style("color", _strToColor("category" + r[config.series[series].categories]))
+                legendEl.select("div .series"+series).append("div")                
+                .attr("class", "pie category_" + r[config.series[series].categories] + " value_" + r[config.series[series].values] + " "+ config.series[series].cssClass)              
+                .style("color", _strToColor("category_" + r[config.series[series].categories]))
                 .html(r[config.series[series].categories] + ": " + r[config.series[series].values]);
             });
         }
@@ -551,6 +551,10 @@ function cd3(config) {
 
                     //Update slice positions
                     path.data(pie(pieData))
+
+                        .attr("fill", function (d, i) {
+                        return _strToColor("category_" + d.data[config.series[series].categories]);
+                    })                    
                         .transition()
                         .call(function (obj) {
                         _do(obj, series, "onChange");
@@ -561,9 +565,11 @@ function cd3(config) {
                     path.data(pie(pieData))
                         .enter()
                         .append("path")
-                        .attr("class", "series" + series + " pie " + config.series[series].values + " " + config.series[series].cssClass)
+                    .attr("class", function(d,i){
+                        return "pie category_" + d.data[config.series[series].categories] + " value_" + d.data[config.series[series].values] + " "+ config.series[series].cssClass
+                    })
                         .attr("fill", function (d, i) {
-                        return _strToColor("category" + d.data[config.series[series].categories]);
+                        return _strToColor("category_" + d.data[config.series[series].categories]);
                     })
                         .transition()
                         .call(function (obj) {
