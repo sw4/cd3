@@ -3,7 +3,7 @@ cd3
 
 Reusable charting library for d3.js
 
-###[Example Charts](http://jsfiddle.net/C2m5V/)###
+###[Example Charts](http://jsfiddle.net/64pX3/)###
 
 Key development tenets:
 
