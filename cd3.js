@@ -1,7 +1,7 @@
 function cd3(config) {
 
     var chart = {},
-        parentEl = null,
+    parentEl = null,
         svgEl = null,
         chartEl = null,
         seriesEl = null,
@@ -63,10 +63,10 @@ function cd3(config) {
             scale: "linear",
             format: null,
             values: null,
-            ticks:{
-                rotate:0,
-                x:null,
-                y:null
+            ticks: {
+                rotate: 0,
+                x: null,
+                y: null
             }
         }
 
@@ -75,21 +75,22 @@ function cd3(config) {
             scale: "linear",
             format: null,
             values: null,
-            ticks:{
-                rotate:0,
-                x:null,
-                y:null
+            ticks: {
+                rotate: 0,
+                x: null,
+                y: null
             }
         }
 
         // data and series can contain unknown structures, so overwrite defaults with passed objects
         defaults.data = options.data;
         defaults.series = options.series;
-        defaults.xAxis.domain = options.xAxis.domain;
-        defaults.xAxis.range = options.xAxis.range;
-        defaults.yAxis.domain = options.yAxis.domain;
-        defaults.yAxis.range = options.yAxis.range;
-
+        if (options.type !== "pie") {
+            defaults.xAxis.domain = options.xAxis.domain;
+            defaults.xAxis.range = options.xAxis.range;
+            defaults.yAxis.domain = options.yAxis.domain;
+            defaults.yAxis.range = options.yAxis.range;
+        }
         // ensure passed margin is an object
         if (options.margin) options.margin = _resolveMargins(options.margin);
 
@@ -168,7 +169,9 @@ function cd3(config) {
         }
         if (!dimension || dimension == "height") {
             //    svgEl.attr("height", config.height);
-            xAxisEl.attr("transform", "translate(0," + (config.height - config.margin.bottom - config.margin.top) + ")");
+            if (config.type !== "pie") {
+                xAxisEl.attr("transform", "translate(0," + (config.height - config.margin.bottom - config.margin.top) + ")");
+            }
             d3yAxis.ticks(Math.max(config.height / 20, 2));
             range && _resolveRange("y", range);
         }
@@ -197,10 +200,11 @@ function cd3(config) {
         return arr;
     }
     // sort data
-    function _sort(data, key) {
+    function _sort(data, key, dir) {
+        dir = dir || "asc";
         data = data.slice();
         data.sort(function (a, b) {
-            return a[key] - b[key];
+            return dir=="asc" ? a[key] - b[key] : b[key] - a[key];
         });
         return data;
     }
@@ -217,15 +221,19 @@ function cd3(config) {
     // data getter/setter
     function _data(value) {
         if (!arguments.length) return config.data;
-        config.data = _compileData();
-        // data has changed so resolve domains
-        _resolveDomain("x");
-        _resolveDomain("y");
-        // domains have changed...so redraw axes
-        _drawAxis("x");
-        _drawAxis("y");
-        // now redraw series...
-        _redrawSeries();
+        if (value.length > 0) {
+            config.data = _compileData();
+            if (config.type !== "pie") {
+                // data has changed so resolve domains
+                _resolveDomain("x");
+                _resolveDomain("y");
+                // domains have changed...so redraw axes
+                _drawAxis("x");
+                _drawAxis("y");
+            }
+            // now redraw series...
+            _redrawSeries();
+        }
         return chart;
     }
 
@@ -239,31 +247,32 @@ function cd3(config) {
         return d3yAxis;
     }
 
-    
-    function _resolveTicks(axis){
-        if (axis) axis = axis.toLowerCase();   
+
+    function _resolveTicks(axis) {
+        if (axis) axis = axis.toLowerCase();
         ticks = axis == "x" ? xAxisEl.selectAll(".tick text") : yAxisEl.selectAll(".tick text");
-        if(config[axis+"Axis"].ticks.rotate > 0){
+        if (config[axis + "Axis"].ticks.rotate > 0) {
             ticks.attr("transform", function (d) {
-                return "rotate(" + config[axis+"Axis"].ticks.rotate + ")"
+                return "rotate(" + config[axis + "Axis"].ticks.rotate + ")"
             });
         }
-        if(config[axis+"Axis"].ticks.x){            
-            ticks.attr("x", config[axis+"Axis"].ticks.x);
+        if (config[axis + "Axis"].ticks.x) {
+            ticks.attr("x", config[axis + "Axis"].ticks.x);
         }
-        if(config[axis+"Axis"].ticks.y){            
-            ticks.attr("y", config[axis+"Axis"].ticks.y);
-        } 
+        if (config[axis + "Axis"].ticks.y) {
+            ticks.attr("y", config[axis + "Axis"].ticks.y);
+        }
         if (axis == "x") {
-            d3xAxis.ticks(Math.max(config.width / 130, 2)); 
+            d3xAxis.ticks(Math.max(config.width / 130, 2));
         }
         if (axis == "y") {
-            d3yAxis.ticks(Math.max(config.height / 20, 2)); 
+            d3yAxis.ticks(Math.max(config.height / 20, 2));
         }
     }
+
     function _drawAxis(axis) {
 
-        if (axis) axis = axis.toLowerCase();        
+        if (axis) axis = axis.toLowerCase();
         if (!axis || axis == "x") {
             xAxisEl.call(d3xAxis);
             _resolveTicks("x");
@@ -472,10 +481,20 @@ function cd3(config) {
         return chart;
     }
 
-
+    function _resolveLegend(series){
+        if (config.type === "pie") {
+            config.data=_sort(config.data, config.series[series].values, "desc");
+            legendEl.select("div .series"+series).selectAll("div").remove();            
+            config.data.forEach(function (r) {                
+                legendEl.select("div .series"+series).append("div")
+                .attr("class", "series" + series + " category " + config.type + " " + config.series[series].values + " " + config.series[series].cssClass)
+                .style("color", _strToColor("category" + r[config.series[series].categories]))
+                .html(r[config.series[series].categories] + ": " + r[config.series[series].values]);
+            });
+        }
+    }
     function _drawSeries(series) {
         var serieEl = seriesEl.append("g").attr("class", "series" + series);
-
 
         // randomly generate the series colors if not already done...
         config.series[series].color = config.series[series].color || _strToColor("series" + series + config.series[series].values);
@@ -489,12 +508,11 @@ function cd3(config) {
             _do(path, series, "onAdd");
         }
 
-        if(legendEl){
-            legendEl
-            .append("div")
-            .attr("class", "series" + series + " "+config.type+" " + config.series[series].values + " " + config.series[series].cssClass)
-             .style("color", config.series[series].color)
-            .html(series.title || "series"+series)
+        if (legendEl) {
+            legendEl.append("div")
+                .attr("class", "series" + series + " " + config.type + " " + config.series[series].values + " " + config.series[series].cssClass)
+                .style("color", config.series[series].color)
+                .html(series.title || "series" + series);
         }
         _redrawSeries(series);
     }
@@ -510,6 +528,51 @@ function cd3(config) {
         }
         seriesList.forEach(function (series) {
             switch (config.type) {
+
+                case "pie":
+
+                    var radius = Math.min(config.width - config.margin.left - config.margin.right, config.height - config.margin.top - config.margin.bottom) / 2;
+                    seriesEl.select(".series" + series)
+                        .attr("transform", "translate(" + (config.width - config.margin.left - config.margin.right) / 2 + "," + (config.height - config.margin.top - config.margin.bottom) / 2 + ")");
+                    var arc = d3.svg.arc().outerRadius(radius);
+                    var pie = d3.layout.pie().value(function (d) {
+                        return d[config.series[series].values];
+                    });
+                    var path = seriesEl.select(".series" + series).selectAll("path");
+
+                    //Update slice positions
+                    path.data(pie(config.data))
+                        .transition()
+                        .call(function (obj) {
+                        _do(obj, series, "onChange");
+                    })
+                        .attr("d", arc);
+
+                    //Add new slices
+                    path.data(pie(config.data))
+                        .enter()
+                        .append("path")
+                        .attr("class", "series" + series + " pie " + config.series[series].values + " " + config.series[series].cssClass)
+                        .attr("fill", function (d, i) {
+                        return _strToColor("category" + d.data[config.series[series].categories]);
+                    })
+                        .transition()
+                        .call(function (obj) {
+                        _do(obj, series, "onChange");
+                    })
+                        .attr("d", arc);
+
+                    // Remove old slices            
+                    path.data(pie(config.data))
+                        .exit()
+                        .transition()
+                        .call(function (obj) {
+                        _do(obj, series, "onChange");
+                    }).remove();
+                    _resolveLegend(series);
+
+                    break;
+
                 case "line":
                     var line = d3.svg.line()
                         .x(function (d, i) {
@@ -711,8 +774,10 @@ function cd3(config) {
 
     function _resize() {
         _resolveSizing("auto");
-        _drawAxis("x");
-        _drawAxis("y");
+        if (config.type !== "pie") {
+            _drawAxis("x");
+            _drawAxis("y");
+        }
         config.series.forEach(function (serie, index) {
             // redraw line data....       
             _redrawSeries(index);
@@ -748,26 +813,29 @@ function cd3(config) {
         titleEl = titleEl || config.title ? svgEl.append("text").text(config.title).attr("class", "title").attr("y", config.margin.top - (config.margin.top / 2)) : null;
         legendEl = legendEl || config.legend ? parentEl.append("div").attr("class", "legend") : null;
         seriesEl = seriesEl || chartEl.append("g").attr("class", "series");
-        axesEl = axesEl || chartEl.append("g").attr("class", "axes");
-        xAxisEl = xAxisEl || axesEl.append("g").attr("class", "x axis");
-        yAxisEl = yAxisEl || axesEl.append("g").attr("class", "y axis");
+        if (config.type !== "pie") {
+            axesEl = axesEl || chartEl.append("g").attr("class", "axes");
+            xAxisEl = xAxisEl || axesEl.append("g").attr("class", "x axis");
+            yAxisEl = yAxisEl || axesEl.append("g").attr("class", "y axis");
+        }
+
 
         // format the raw data...do first so domains can be calculated correctly
         _compileData();
 
         // sizes all elements...also dont change ranges...as scales not setup
         _resolveSizing(false);
+        if (config.type !== "pie") {
+            // orient the axes
+            d3xAxis.orient("bottom");
+            d3yAxis.orient("left");
 
-        // orient the axes
-        d3xAxis.orient("bottom");
-        d3yAxis.orient("left");
-
-        _resolveFormat("x");
-        _resolveFormat("y");
-        // create scale, automatically propogates domain and ranges..do before sizing so scales exist.
-        _resolveScale("x");
-        _resolveScale("y");
-
+            _resolveFormat("x");
+            _resolveFormat("y");
+            // create scale, automatically propogates domain and ranges..do before sizing so scales exist.
+            _resolveScale("x");
+            _resolveScale("y");
+        }
         config.series.forEach(function (serie, index) {
             // draw initial series....       
             _drawSeries(index);
@@ -776,4 +844,4 @@ function cd3(config) {
     }
     return chart;
 };
-     
+
