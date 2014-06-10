@@ -4,7 +4,7 @@ cd3
 Reusable charting library for d3.js
 
 ###[Example Line/Bar/Column/Scatter Charts](http://jsfiddle.net/sCE8A/)###
-###[Example Pie/Donut Charts](http://jsfiddle.net/jpw95/)###
+###[Example Pie/Donut Charts](http://jsfiddle.net/BaV77/)###
 
 Key development tenets:
 
