@@ -652,6 +652,14 @@ function cd3(config) {
                     })
                         .attr("cy", function (d) {
                         return d3yScale(d[config.series[series].values]);
+                    }).attr("r", function(d, i){
+                        if(typeof config.series[series].radius == "function"){
+                            return config.series[series].radius(d,i);
+                        }else if (typeof config.series[series].radius == "number"){
+                            return config.series[series].radius;
+                        }else{
+                             return 2.5;   
+                        }
                     });
 
                     //Add new circles
@@ -671,7 +679,15 @@ function cd3(config) {
                         .attr("cy", function (d) {
                         return d3yScale(d[config.series[series].values]);
                     })
-                        .attr("r", 2.5);
+                    .attr("r", function(d, i){
+                        if(typeof config.series[series].radius == "function"){
+                            return config.series[series].radius(d,i);
+                        }else if (typeof config.series[series].radius == "number"){
+                            return config.series[series].radius;
+                        }else{
+                             return 2.5;   
+                        }
+                    });
 
                     // Remove old circles
                     circle.data(config.data)
