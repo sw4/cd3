@@ -5,7 +5,7 @@ Reusable charting library for d3.js
 
 ###[Example Line/Area/Bar/Column/Scatter Charts](http://jsfiddle.net/Qy4e8/embedded/result/)### 
 
-(http://jsfiddle.net/WJSDt/)
+http://jsfiddle.net/WJSDt/
 
 ###[Example Pie/Donut Charts](http://jsfiddle.net/BaV77/)###
 
