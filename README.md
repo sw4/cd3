@@ -3,7 +3,7 @@ cd3
 
 Reusable charting library for d3.js
 
-###[Example Line/Area/Bar/Column/Scatter Charts](http://jsfiddle.net/Qy4e8/embedded/result/)### 
+###[Example Line/Area/Bar/Column/Scatter Charts](http://jsfiddle.net/Qy4e8/embedded/result/)
 
 http://jsfiddle.net/WJSDt/
 
