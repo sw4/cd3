@@ -25,4 +25,6 @@
 .cd3 g.series path, .cd3 g.series circle{
     shape-rendering: geometricPrecision;    
 }
-
+.cd3 .series path.area{
+    fill-opacity:0.1;
+}
