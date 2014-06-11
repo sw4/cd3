@@ -16,7 +16,7 @@
     right:10px;
     top:10px;
 }
-.cd3 .series path:not(.pie) {
+.cd3 .series path:not(.pie):not(.area) {
     fill:none;
 }
 .cd3 g.series rect{

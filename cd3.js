@@ -199,13 +199,13 @@ function cd3(config) {
         }
         return arr;
     }
-    
+
     // sort data
     function _sort(data, key, dir) {
         dir = dir || "asc";
         data = data.slice();
         data.sort(function (a, b) {
-            return dir=="asc" ? a[key] - b[key] : b[key] - a[key];
+            return dir == "asc" ? a[key] - b[key] : b[key] - a[key];
         });
         return data;
     }
@@ -483,22 +483,23 @@ function cd3(config) {
         return chart;
     }
 
-    function _resolveLegend(series){
+    function _resolveLegend(series) {
         if (config.type === "pie") {
             // data needs to be filtered to exclude zero and negative amounts
-            var pieData = config.data.filter(function(r){
-                return r[config.series[series].values] >0;           
-            });         
-            pieData=_sort(pieData, config.series[series].values, "desc");
-            legendEl.select("div .series"+series).selectAll("div").remove();            
-            pieData.forEach(function (r) {                
-                legendEl.select("div .series"+series).append("div")                
-                .attr("class", "pie category_" + r[config.series[series].categories] + " value_" + r[config.series[series].values] + " "+ config.series[series].cssClass)              
-                .style("color", _strToColor("category_" + r[config.series[series].categories]+"value_" + r[config.series[series].values]))
-                .html(r[config.series[series].categories] + ": " + r[config.series[series].values]);
+            var pieData = config.data.filter(function (r) {
+                return r[config.series[series].values] > 0;
+            });
+            pieData = _sort(pieData, config.series[series].values, "desc");
+            legendEl.select("div .series" + series).selectAll("div").remove();
+            pieData.forEach(function (r) {
+                legendEl.select("div .series" + series).append("div")
+                    .attr("class", "pie category_" + r[config.series[series].categories] + " value_" + r[config.series[series].values] + " " + config.series[series].cssClass)
+                    .style("color", _strToColor("category_" + r[config.series[series].categories] + "value_" + r[config.series[series].values]))
+                    .html(r[config.series[series].categories] + ": " + r[config.series[series].values]);
             });
         }
     }
+
     function _drawSeries(series) {
         var serieEl = seriesEl.append("g").attr("class", "series" + series);
 
@@ -506,15 +507,24 @@ function cd3(config) {
         config.series[series].color = config.series[series].color || _strToColor("series" + series + config.series[series].values);
 
         // lines need the path drawn in advance
-        if (config.type === "line") {
+        if (config.type === "line" || config.type === "area") {
 
             var path = serieEl.append("path")
                 .attr("class", "series" + series + " line " + config.series[series].values + " " + config.series[series].cssClass)
                 .attr("stroke", config.series[series].color);
             _do(path, series, "onAdd");
+
+            if (config.type == "area") {
+                var area = serieEl.append("path")
+                    .attr("class", "series" + series + " area " + config.series[series].values + " " + config.series[series].cssClass)
+                    .attr("fill", config.series[series].color);
+                _do(area, series, "onAdd");
+            }
+
+
         } else if (config.type === "pie") {
-            config.series[series].donut = config.series[series].donut || 0;      
-        }   
+            config.series[series].donut = config.series[series].donut || 0;
+        }
 
         if (legendEl) {
             legendEl.append("div")
@@ -539,15 +549,15 @@ function cd3(config) {
 
                 case "pie":
                     // data needs to be filtered to exclude zero and negative amounts
-                    var pieData = config.data.filter(function(r){
-                        return r[config.series[series].values] >0;           
-                    });    
-                    
+                    var pieData = config.data.filter(function (r) {
+                        return r[config.series[series].values] > 0;
+                    });
+
                     var radius = Math.min(config.width - config.margin.left - config.margin.right, config.height - config.margin.top - config.margin.bottom) / 2;
                     seriesEl.select(".series" + series)
                         .attr("transform", "translate(" + (config.width - config.margin.left - config.margin.right) / 2 + "," + (config.height - config.margin.top - config.margin.bottom) / 2 + ")");
                     var arc = d3.svg.arc().outerRadius(radius)
-    .innerRadius(radius*(config.series[series].donut/100));
+                        .innerRadius(radius * (config.series[series].donut / 100));
                     var pie = d3.layout.pie().value(function (d) {
                         return d[config.series[series].values];
                     });
@@ -557,8 +567,8 @@ function cd3(config) {
                     path.data(pie(pieData))
 
                         .attr("fill", function (d, i) {
-                        return _strToColor("category_" + d.data[config.series[series].categories]+"value_" + d.data[config.series[series].values]);
-                    })                    
+                        return _strToColor("category_" + d.data[config.series[series].categories] + "value_" + d.data[config.series[series].values]);
+                    })
                         .transition()
                         .call(function (obj) {
                         _do(obj, series, "onChange");
@@ -569,11 +579,11 @@ function cd3(config) {
                     path.data(pie(pieData))
                         .enter()
                         .append("path")
-                    .attr("class", function(d,i){
-                        return "pie category_" + d.data[config.series[series].categories] + " value_" + d.data[config.series[series].values] + " "+ config.series[series].cssClass
+                        .attr("class", function (d, i) {
+                        return "pie category_" + d.data[config.series[series].categories] + " value_" + d.data[config.series[series].values] + " " + config.series[series].cssClass
                     })
                         .attr("fill", function (d, i) {
-                        return _strToColor("category_" + d.data[config.series[series].categories]+"value_" + d.data[config.series[series].values]);
+                        return _strToColor("category_" + d.data[config.series[series].categories] + "value_" + d.data[config.series[series].values]);
                     })
                         .transition()
                         .call(function (obj) {
@@ -591,7 +601,7 @@ function cd3(config) {
                     _resolveLegend(series);
 
                     break;
-
+                case "area":
                 case "line":
                     var line = d3.svg.line()
                         .x(function (d, i) {
@@ -600,7 +610,26 @@ function cd3(config) {
                         .y(function (d, i) {
                         return d3yScale(d[config.series[series].values]);
                     });
-                    seriesEl.select(".series" + series).select("path")
+
+                    if (config.type == "area") {
+                        var area = d3.svg.area()
+                            .x(function (d) {
+                            return d3xScale(d[config.xAxis.values]);
+                        })
+                            .y0(config.height - config.margin.top - config.margin.bottom)
+                            .y1(function (d) {
+                            return d3yScale(d[config.series[series].values]);
+                        });
+
+                        seriesEl.select(".series" + series).select("path.area")
+                            .data([config.data])
+                            .transition()
+                            .call(function (obj) {
+                            _do(obj, series, "onChange");
+                        })
+                            .attr("d", area);
+                    }
+                    seriesEl.select(".series" + series).select("path.line")
                         .data([config.data])
                         .transition()
                         .call(function (obj) {
@@ -668,13 +697,13 @@ function cd3(config) {
                     } else {
                         dimension = config.yAxis.type == "ordinal" ? d3yScale.rangeBand() : (config.height - config.margin.top - config.margin.bottom) / config.data.length;
                     }
-                    dimension=dimension/config.series.length;
+                    dimension = dimension / config.series.length;
                     dimension = dimension < 2 ? 2 : dimension;
 
-                    function seriesOffset(i){
-                        return (i*(dimension*config.series.length)+dimension*series) 
+                    function seriesOffset(i) {
+                        return (i * (dimension * config.series.length) + dimension * series)
                     }
-                    
+
                     var rect = seriesEl.select(".series" + series).selectAll("rect");
                     //Update bars/columns positions
                     rect.data(config.data)
