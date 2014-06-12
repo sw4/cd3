@@ -45,6 +45,8 @@ function cd3(config) {
             stacked: false,
             fit: true,
             type: null,
+            drawHeight:0,
+            drawWidth:0,
             margin: {
                 top: 40,
                 right: 40,
@@ -159,6 +161,10 @@ function cd3(config) {
         // automatically define height/width based on parent
         config.width = parseInt(parentEl.style("width"));
         config.height = parseInt(parentEl.style("height"));
+
+        
+        config.drawHeight = config.height - config.margin.top - config.margin.bottom;
+        config.drawWidth = config.width - config.margin.left - config.margin.right;
 
 
         // size anything related to height/width...including ranges
@@ -773,12 +779,12 @@ function cd3(config) {
 
 
                     function calcY(d, i) {
-                        var barHeight = chartHeight - d3yScale(d.y);
-                        var prevBarHeight = chartHeight - d3yScale(d.y0);
+                        var barHeight = config.drawHeight - d3yScale(d.y);
+                        var prevBarHeight = config.drawHeight - d3yScale(d.y0);
 
                         if (config.type == "column" && config.stacked) {
                             // stacked column
-                            return chartHeight - barHeight - prevBarHeight;
+                            return config.drawHeight - barHeight - prevBarHeight;
                         } else if (config.type == "column") {
                             // regular column
                             return d3yScale(d[config.series[series].values]);
@@ -808,10 +814,10 @@ function cd3(config) {
                     function calcHeight(d) {
                         if (config.type == "column" && config.stacked) {
                             // stacked column
-                            return chartHeight - d3yScale(d.y);
+                            return config.drawHeight - d3yScale(d.y);
                         } else if (config.type == "column") {
                             // regular column
-                            return chartHeight - d3yScale(d[config.series[series].values]);
+                            return config.drawHeight - d3yScale(d[config.series[series].values]);
                         } else if (config.stacked) {
                             // stacked bar   
                         } else {
@@ -842,8 +848,8 @@ function cd3(config) {
                         .call(function (obj) {
                         _do(obj, series, "onChange");
                     })
-                        .attr("y", function (d, i) {
-                        return calcY(d, i);
+                        .attr("y", function (d, i) {                         
+                         return calcY(d, i);
                     })
                         .attr("x", function (d, i) {
                         return calcX(d, i);
@@ -854,8 +860,6 @@ function cd3(config) {
                         .attr("width", function (d) {
                         return config.type == "column" ? dimension - 2 : d3xScale(d[config.series[series].values]);
                     });
-
-                    var chartHeight = (config.height - config.margin.top - config.margin.bottom);
 
                     //Add new bars/columns
                     rect.data(dataSet)
@@ -882,7 +886,7 @@ function cd3(config) {
                         .attr("width", function (d) {
                         return config.type == "column" ? dimension - 2 : d3xScale(d[config.series[series].values]);
                     });
-
+/*
                     // Remove old bars/columns
                     rect.data(dataSet)
                         .exit()
@@ -891,7 +895,7 @@ function cd3(config) {
                         _do(obj, series, "onRemove");
                     })
                         .remove();
-
+*/
 
 
                     break;
