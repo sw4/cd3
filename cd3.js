@@ -42,6 +42,7 @@ function cd3(config) {
         var defaults = {
             element: {},
             resampling: true,
+            stacked: false,
             fit: true,
             type: null,
             margin: {
@@ -483,6 +484,26 @@ function cd3(config) {
         return chart;
     }
 
+    function _stackData() {
+
+        var series = [];
+        config.series.forEach(function (serie) {
+            series.push(serie.values);
+        });
+
+
+        var stacked = d3.layout.stack()(series.map(function (stack) {
+            return config.data.map(function (d) {
+                return {
+                    x: d[config.xAxis.values],
+                    y: +d[stack]
+                };
+            });
+        }));
+        return stacked;
+
+    }
+
     function _resolveLegend(series) {
         if (config.type === "pie") {
             // data needs to be filtered to exclude zero and negative amounts
@@ -652,13 +673,13 @@ function cd3(config) {
                     })
                         .attr("cy", function (d) {
                         return d3yScale(d[config.series[series].values]);
-                    }).attr("r", function(d, i){
-                        if(typeof config.series[series].radius == "function"){
-                            return config.series[series].radius(d,i);
-                        }else if (typeof config.series[series].radius == "number"){
+                    }).attr("r", function (d, i) {
+                        if (typeof config.series[series].radius == "function") {
+                            return config.series[series].radius(d, i);
+                        } else if (typeof config.series[series].radius == "number") {
                             return config.series[series].radius;
-                        }else{
-                             return 2.5;   
+                        } else {
+                            return 2.5;
                         }
                     });
 
@@ -679,13 +700,13 @@ function cd3(config) {
                         .attr("cy", function (d) {
                         return d3yScale(d[config.series[series].values]);
                     })
-                    .attr("r", function(d, i){
-                        if(typeof config.series[series].radius == "function"){
-                            return config.series[series].radius(d,i);
-                        }else if (typeof config.series[series].radius == "number"){
+                        .attr("r", function (d, i) {
+                        if (typeof config.series[series].radius == "function") {
+                            return config.series[series].radius(d, i);
+                        } else if (typeof config.series[series].radius == "number") {
                             return config.series[series].radius;
-                        }else{
-                             return 2.5;   
+                        } else {
+                            return 2.5;
                         }
                     });
 
@@ -701,19 +722,113 @@ function cd3(config) {
 
                     break;
 
-                case "bar":
-                case "column":
-
+                case "stack":
 
                     // define dimensions (height for bar, width for column)
                     var dimension = 0;
                     // give dimensio value depending on nautre of chart and scale
+
+                    dimension = config.xAxis.type == "ordinal" ? d3xScale.rangeBand() : (config.width - config.margin.left - config.margin.right) / config.data.length;
+
+                    dimension = dimension < 2 ? 2 : dimension;
+
+
+                    var stackedData = _stackData()[series];
+                    //      console.log(stackedData[series]);
+                    var rect = seriesEl.select(".series" + series).selectAll("rect");
+                    rect.data(stackedData)
+                        .enter().append("svg:rect")
+                        .attr("x", function (d) {
+                        return d3xScale(d.x);
+                    })
+                        .attr("y", function (d) {
+                        var barHeight = (config.height - config.margin.top - config.margin.bottom) - d3yScale(d.y);
+                        var prevBarHeight = (config.height - config.margin.top - config.margin.bottom) - d3yScale(d.y0);
+                        var bottom = (config.height - config.margin.top - config.margin.bottom);
+                        return bottom - barHeight - prevBarHeight;
+                    })
+                        .attr("height", function (d) {
+                        return (config.height - config.margin.top - config.margin.bottom) - d3yScale(d.y);
+                    })
+                        .attr("fill", config.series[series].color)
+                        .attr("width", dimension);
+
+
+
+
+
+
+
+
+
+
+                    break;
+
+
+                case "bar":
+                case "column":
+
+                    // if the chart should be stacked...repurpose the dataset
+                    var dataSet = config.stacked ? _stackData()[series] : config.data;
+
+
+                    function calcY(d, i) {
+                        var barHeight = chartHeight - d3yScale(d.y);
+                        var prevBarHeight = chartHeight - d3yScale(d.y0);
+
+                        if (config.type == "column" && config.stacked) {
+                            // stacked column
+                            return chartHeight - barHeight - prevBarHeight;
+                        } else if (config.type == "column") {
+                            // regular column
+                            return d3yScale(d[config.series[series].values]);
+                        } else if (config.stacked) {
+                            // stacked bar   
+                        } else {
+                            // regular bar
+                            return seriesOffset(i) + 1;
+                        }
+                    }
+
+                    function calcX(d, i) {
+                        if (config.type == "column" && config.stacked) {
+                            // stacked column
+                            return d3xScale(d.x);
+                        } else if (config.type == "column") {
+                            // regular column
+                            return seriesOffset(i) + 1;
+                        } else if (config.stacked) {
+                            // stacked bar   
+                        } else {
+                            // regular bar
+                            return 0;
+                        }
+                    }
+
+                    function calcHeight(d) {
+                        if (config.type == "column" && config.stacked) {
+                            // stacked column
+                            return chartHeight - d3yScale(d.y);
+                        } else if (config.type == "column") {
+                            // regular column
+                            return chartHeight - d3yScale(d[config.series[series].values]);
+                        } else if (config.stacked) {
+                            // stacked bar   
+                        } else {
+                            // regular bar
+                            return dimension - 2;
+                        }
+                    }
+                    // define dimensions (height for bar, width for column)
+                    var dimension = 0;
+
+                    // give dimensio value depending on nautre of chart and scale                    
                     if (config.type == "column") {
                         dimension = config.xAxis.type == "ordinal" ? d3xScale.rangeBand() : (config.width - config.margin.left - config.margin.right) / config.data.length;
                     } else {
                         dimension = config.yAxis.type == "ordinal" ? d3yScale.rangeBand() : (config.height - config.margin.top - config.margin.bottom) / config.data.length;
                     }
-                    dimension = dimension / config.series.length;
+                    dimension = config.stacked ? dimension : dimension / config.series.length;
                     dimension = dimension < 2 ? 2 : dimension;
 
                     function seriesOffset(i) {
@@ -722,27 +837,28 @@ function cd3(config) {
 
                     var rect = seriesEl.select(".series" + series).selectAll("rect");
                     //Update bars/columns positions
-                    rect.data(config.data)
+                    rect.data(dataSet)
                         .transition()
                         .call(function (obj) {
                         _do(obj, series, "onChange");
                     })
                         .attr("y", function (d, i) {
-                        return config.type == "column" ? d3yScale(d[config.series[series].values]) : seriesOffset(i) + 1;
+                        return calcY(d, i);
                     })
                         .attr("x", function (d, i) {
-                        return config.type == "column" ? seriesOffset(i) + 1 : 0;
+                        return calcX(d, i);
                     })
                         .attr("height", function (d) {
-                        return config.type == "column" ? (config.height - config.margin.top - config.margin.bottom) - d3yScale(d[config.series[series].values]) : dimension - 2;
+                        return calcHeight(d);
                     })
                         .attr("width", function (d) {
                         return config.type == "column" ? dimension - 2 : d3xScale(d[config.series[series].values]);
                     });
 
+                    var chartHeight = (config.height - config.margin.top - config.margin.bottom);
 
                     //Add new bars/columns
-                    rect.data(config.data)
+                    rect.data(dataSet)
                         .enter()
                         .append("rect")
                         .attr("class", "series" + series + " line " + config.series[series].values + " " + config.series[series].cssClass)
@@ -752,22 +868,23 @@ function cd3(config) {
                         _do(obj, series, "onAdd");
                     })
                         .attr("y", function (d, i) {
-                        return config.type == "column" ? d3yScale(d[config.series[series].values]) : seriesOffset(i) + 1;
+
+                        return calcY(d, i);
+
                     })
                         .attr("x", function (d, i) {
 
-                        return config.type == "column" ? seriesOffset(i) + 1 : 0;
+                        return calcX(d, i);
                     })
                         .attr("height", function (d) {
-                        return config.type == "column" ? (config.height - config.margin.top - config.margin.bottom) - d3yScale(d[config.series[series].values]) : dimension - 2;
+                        return calcHeight(d);
                     })
                         .attr("width", function (d) {
-
                         return config.type == "column" ? dimension - 2 : d3xScale(d[config.series[series].values]);
                     });
 
                     // Remove old bars/columns
-                    rect.data(config.data)
+                    rect.data(dataSet)
                         .exit()
                         .transition()
                         .call(function (obj) {
