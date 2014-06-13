@@ -728,49 +728,6 @@ function cd3(config) {
 
                     break;
 
-                case "stack":
-
-                    // define dimensions (height for bar, width for column)
-                    var dimension = 0;
-                    // give dimensio value depending on nautre of chart and scale
-
-                    dimension = config.xAxis.type == "ordinal" ? d3xScale.rangeBand() : (config.width - config.margin.left - config.margin.right) / config.data.length;
-
-                    dimension = dimension < 2 ? 2 : dimension;
-
-
-                    var stackedData = _stackData()[series];
-                    //      console.log(stackedData[series]);
-                    var rect = seriesEl.select(".series" + series).selectAll("rect");
-                    rect.data(stackedData)
-                        .enter().append("svg:rect")
-                        .attr("x", function (d) {
-                        return d3xScale(d.x);
-                    })
-                        .attr("y", function (d) {
-                        var barHeight = (config.height - config.margin.top - config.margin.bottom) - d3yScale(d.y);
-                        var prevBarHeight = (config.height - config.margin.top - config.margin.bottom) - d3yScale(d.y0);
-                        var bottom = (config.height - config.margin.top - config.margin.bottom);
-                        return bottom - barHeight - prevBarHeight;
-                    })
-                        .attr("height", function (d) {
-                        return (config.height - config.margin.top - config.margin.bottom) - d3yScale(d.y);
-                    })
-                        .attr("fill", config.series[series].color)
-                        .attr("width", dimension);
-
-
-
-
-
-
-
-
-
-
-                    break;
-
-
                 case "bar":
                 case "column":
 
