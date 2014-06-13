@@ -790,6 +790,7 @@ function cd3(config) {
                             return d3yScale(d[config.series[series].values]);
                         } else if (config.stacked) {
                             // stacked bar   
+                            return dimension*i;
                         } else {
                             // regular bar
                             return seriesOffset(i) + 1;
@@ -805,6 +806,7 @@ function cd3(config) {
                             return seriesOffset(i) + 1;
                         } else if (config.stacked) {
                             // stacked bar   
+                            return d3xScale(d.y0);
                         } else {
                             // regular bar
                             return 0;
@@ -820,11 +822,28 @@ function cd3(config) {
                             return config.drawHeight - d3yScale(d[config.series[series].values]);
                         } else if (config.stacked) {
                             // stacked bar   
+                            return dimension - 2;
                         } else {
                             // regular bar
                             return dimension - 2;
                         }
                     }
+                    function calcWidth(d) {
+                        if (config.type == "column" && config.stacked) {
+                            // stacked column
+                            return dimension - 2;
+                        } else if (config.type == "column") {
+                            // regular column
+                            return dimension - 2;
+                        } else if (config.stacked) {
+                            // stacked bar   
+                            return d3xScale(d.y);
+                        } else {
+                            // regular bar
+                            return d3xScale(d[config.series[series].values]);
+                        }
+                    }
+                    
                     // define dimensions (height for bar, width for column)
                     var dimension = 0;
 
@@ -858,7 +877,7 @@ function cd3(config) {
                         return calcHeight(d);
                     })
                         .attr("width", function (d) {
-                        return config.type == "column" ? dimension - 2 : d3xScale(d[config.series[series].values]);
+                        return calcWidth(d);
                     });
 
                     //Add new bars/columns
@@ -884,7 +903,7 @@ function cd3(config) {
                         return calcHeight(d);
                     })
                         .attr("width", function (d) {
-                        return config.type == "column" ? dimension - 2 : d3xScale(d[config.series[series].values]);
+                        return calcWidth(d);
                     });
 /*
                     // Remove old bars/columns
