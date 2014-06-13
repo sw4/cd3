@@ -30,6 +30,7 @@ var chart = cd3({
     element:"#chart", // either id or DOM element to place chart within
     type:"line" // chart type; pie, line, bar, column or scatter
     title: "chart", // string to use for chart title
+    stacked: false, // boolean, whether to stack bar or column charts
     data: data, // JSON data
     margin: 10, // either an integer to be uniformly applied to all chart margins, or an object consisting of top, right, bottom, left values
     legend: true, // add a legend to the chart,
