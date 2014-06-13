@@ -3,9 +3,8 @@ cd3
 
 Reusable charting library for d3.js
 
-###Example Charts###
------
-####[Line, Area, Bar, Stacked Bar, Column, Stacked Column, Scatter, Bubble, Pie & Donut Charts](http://jsfiddle.net/j9LNw/embedded/result/)
+
+####Supported: [Line, Area, Bar, Stacked Bar, Column, Stacked Column, Scatter, Bubble, Pie & Donut Charts](http://jsfiddle.net/j9LNw/embedded/result/)
 
 Key development tenets:
 
