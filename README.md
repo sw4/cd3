@@ -1,7 +1,7 @@
 cd3
 ===
 
-Reusable charting library for d3.js
+Reusable charting library for d3.js (work in progress)
 
 
 #####[Line, Area, Bar, Stacked Bar, Column, Stacked Column, Scatter, Bubble, Pie & Donut Charts](http://jsfiddle.net/j9LNw/embedded/result/)
