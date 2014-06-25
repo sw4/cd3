@@ -1,6 +1,8 @@
 .cd3 {
     overflow:hidden;
     position:relative; 
+    height:100%;
+    width:100%;
 }
 .cd3 .axis path, .cd3 .axis line {
     fill: none;
