@@ -4,6 +4,9 @@
     height:100%;
     width:100%;
 }
+.cd3 svg{
+    position:absolute;
+}
 .cd3 .axis path, .cd3 .axis line {
     fill: none;
     stroke: #555555;
