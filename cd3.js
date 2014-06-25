@@ -161,11 +161,9 @@ function cd3(config) {
         // automatically define height/width based on parent
         config.width = parseInt(parentEl.style("width"));
         config.height = parseInt(parentEl.style("height"));
-
         
         config.drawHeight = config.height - config.margin.top - config.margin.bottom;
         config.drawWidth = config.width - config.margin.left - config.margin.right;
-
 
         // size anything related to height/width...including ranges
         if (!dimension || dimension == "width") {
@@ -173,6 +171,7 @@ function cd3(config) {
             titleEl && titleEl.attr("x", (config.width / 2) - (config.margin.left / 2));
             d3xAxis.ticks(Math.max(config.width / 130, 2));
             range && _resolveRange("x", range);
+            svgEl.attr("width",config.width);
         }
         if (!dimension || dimension == "height") {
             //    svgEl.attr("height", config.height);
@@ -181,6 +180,7 @@ function cd3(config) {
             }
             d3yAxis.ticks(Math.max(config.height / 20, 2));
             range && _resolveRange("y", range);
+            svgEl.attr("height",config.height);
         }
         chartEl.attr("transform", "translate(" + config.margin.left + "," + config.margin.top + ")");
     }
