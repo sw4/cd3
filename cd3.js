@@ -843,6 +843,7 @@ function cd3(config) {
                         .append("rect")
                         .attr("class", "series" + series + " line " + config.series[series].values + " " + config.series[series].cssClass)
                         .attr("fill", config.series[series].color)
+                        .attr("stroke", config.series[series].color)
                         .transition()
                         .call(function (obj) {
                         _do(obj, series, "onAdd");
